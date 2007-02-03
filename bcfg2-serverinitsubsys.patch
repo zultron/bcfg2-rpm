@@ -1,0 +1,18 @@
+--- debian/buildsys/common/bcfg2-server.init.orig	2006-12-20 08:54:22.000000000 -0600
++++ debian/buildsys/common/bcfg2-server.init	2006-12-20 09:02:00.000000000 -0600
+@@ -40,6 +40,7 @@
+     if [ "$STATUS" = 0 ]
+     then
+ 	l_msg "bcfg2-server"
++	touch /var/lock/subsys/bcfg2-server
+     else
+ 	l_fail "bcfg2-server"
+     fi
+@@ -51,6 +52,7 @@
+     STATUS=$?
+     if [ "$STATUS" = 0 ]; then
+       l_msg "bcfg2-server"
++      rm -f /var/lock/subsys/bcfg2-server
+       exit 0
+     else
+       l_fail "bcfg2-server"
