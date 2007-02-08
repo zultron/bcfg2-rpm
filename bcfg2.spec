@@ -1,14 +1,16 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
+%define subversion d
+
 Name:             bcfg2
-Version:          0.8.7.3
-Release:          2%{?dist}
+Version:          0.9.1
+Release:          1%{?subversion:.%{subversion}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?subversion}.tar.gz
 Patch0:           bcfg2-serverinitsubsys.patch
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -64,7 +66,7 @@ Requires(postun): /sbin/service
 Configuration management server
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{?subversion}
 %patch0 -p0 -b .serverinitsubsys
 
 # fixup some paths
@@ -186,6 +188,7 @@ fi
 %{_sbindir}/bcfg2-repo-validate
 %{_sbindir}/bcfg2-server
 
+%{_mandir}/man8/bcfg2-admin.8*
 %{_mandir}/man8/bcfg2-build-reports.8*
 %{_mandir}/man8/bcfg2-info.8*
 %{_mandir}/man8/bcfg2-repo-validate.8*
@@ -194,6 +197,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Thu Feb  8 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.1-1.d
+- Update to 0.9.1d
+
 * Tue Jan  9 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.8.7.3-2
 - Merge client back into base package.
 
