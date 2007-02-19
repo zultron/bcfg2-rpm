@@ -1,16 +1,14 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-%define subversion d
-
 Name:             bcfg2
-Version:          0.9.1
-Release:          1%{?subversion:.%{subversion}}%{?dist}
+Version:          0.9.2
+Release:          1%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?subversion}.tar.gz
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
 Patch0:           bcfg2-serverinitsubsys.patch
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -66,7 +64,7 @@ Requires(postun): /sbin/service
 Configuration management server
 
 %prep
-%setup -q -n %{name}-%{version}%{?subversion}
+%setup -q
 %patch0 -p0 -b .serverinitsubsys
 
 # fixup some paths
@@ -197,6 +195,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Feb 19 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.2-1
+- Update to 0.9.2
+
 * Thu Feb  8 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.1-1.d
 - Update to 0.9.1d
 
