@@ -2,7 +2,7 @@
 
 Name:             bcfg2
 Version:          0.9.2
-Release:          1%{?dist}
+Release:          2%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -98,6 +98,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
 mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
 mkdir -p %{buildroot}%{_libexecdir}
 mkdir -p %{buildroot}%{_var}/lib/bcfg2
+mkdir -p %{buildroot}%{_var}/cache/bcfg2
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
@@ -167,6 +168,8 @@ fi
 
 %{_libexecdir}/bcfg2-cron
 
+%{_var}/cache/bcfg2
+
 %files server
 %defattr(-,root,root,-)
 
@@ -195,6 +198,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Wed Feb 28 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.2-2
+- Fix #230478
+
 * Mon Feb 19 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.2-1
 - Update to 0.9.2
 
