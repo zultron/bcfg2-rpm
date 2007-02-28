@@ -2,7 +2,7 @@
 
 Name:             bcfg2
 Version:          0.9.2
-Release:          2%{?dist}
+Release:          3%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -168,7 +168,7 @@ fi
 
 %{_libexecdir}/bcfg2-cron
 
-%{_var}/cache/bcfg2
+%dir %{_var}/cache/bcfg2
 
 %files server
 %defattr(-,root,root,-)
@@ -198,6 +198,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Wed Feb 28 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.2-3
+- Don't forget %%dir
+
 * Wed Feb 28 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.2-2
 - Fix #230478
 
