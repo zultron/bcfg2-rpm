@@ -2,7 +2,7 @@
 
 Name:             bcfg2
 Version:          0.9.2
-Release:          3%{?dist}
+Release:          4%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -55,6 +55,7 @@ Requires:         bcfg2 = %{version}-%{release}
 Requires:         /usr/sbin/sendmail
 Requires:         /usr/bin/openssl
 Requires:         gamin-python
+Requires:         pyOpenSSL
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
@@ -198,6 +199,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Tue Mar 20 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.2-4
+- Server needs pyOpenSSL
+
 * Wed Feb 28 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.2-3
 - Don't forget %%dir
 
