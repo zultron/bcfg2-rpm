@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:             bcfg2
-Version:          0.9.2
-Release:          4%{?dist}
+Version:          0.9.3
+Release:          1%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -162,6 +162,7 @@ fi
 %{python_sitelib}/Bcfg2/Client
 %{python_sitelib}/Bcfg2/Logging.*
 %{python_sitelib}/Bcfg2/Options.*
+%{python_sitelib}/Bcfg2/tlslite
 
 %{_sbindir}/bcfg2
 %{_mandir}/man1/bcfg2.1*
@@ -199,6 +200,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Apr 30 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.3-1
+- Update to 0.9.3
+
 * Tue Mar 20 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.2-4
 - Server needs pyOpenSSL
 
