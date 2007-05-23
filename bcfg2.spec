@@ -2,7 +2,7 @@
 
 Name:             bcfg2
 Version:          0.9.3
-Release:          1%{?dist}
+Release:          2%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -55,7 +55,7 @@ Requires:         bcfg2 = %{version}-%{release}
 Requires:         /usr/sbin/sendmail
 Requires:         /usr/bin/openssl
 Requires:         gamin-python
-Requires:         pyOpenSSL
+Requires:         redhat-lsb
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
@@ -200,6 +200,11 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Tue May 22 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.3-2
+- Drop requires on pyOpenSSL
+- Add requires on redhat-lsb
+- (Fixes #240871)
+
 * Mon Apr 30 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.3-1
 - Update to 0.9.3
 
