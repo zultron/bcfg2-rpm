@@ -1,14 +1,16 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
+%define pre 2
+
 Name:             bcfg2
-Version:          0.9.3
-Release:          2%{?dist}
+Version:          0.9.4
+Release:          0.1%{?pre:.pre%{pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?pre:pre%{pre}}.tar.gz
 Patch0:           bcfg2-serverinitsubsys.patch
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -65,7 +67,7 @@ Requires(postun): /sbin/service
 Configuration management server
 
 %prep
-%setup -q
+%setup -q -n bcfg2-%{version}%{?pre:pre%{pre}}
 %patch0 -p0 -b .serverinitsubsys
 
 # fixup some paths
@@ -200,6 +202,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Tue Jun 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-0.1.pre2
+- Update to 0.9.4pre2
+
 * Tue May 22 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.3-2
 - Drop requires on pyOpenSSL
 - Add requires on redhat-lsb
