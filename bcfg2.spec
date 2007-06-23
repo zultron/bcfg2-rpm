@@ -1,6 +1,6 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-%define pre 2
+%define pre 4
 
 Name:             bcfg2
 Version:          0.9.4
@@ -202,6 +202,12 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Thu Jun 21 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-0.1.pre4
+- Update to 0.9.4pre4
+
+* Thu Jun 14 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-0.1.pre3
+- Update to 0.9.4pre3
+
 * Tue Jun 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-0.1.pre2
 - Update to 0.9.4pre2
 
