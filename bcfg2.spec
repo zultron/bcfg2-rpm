@@ -4,7 +4,7 @@
 
 Name:             bcfg2
 Version:          0.9.4
-Release:          2%{?pre:.pre%{pre}}%{?dist}
+Release:          3%{?pre:.pre%{pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -12,6 +12,7 @@ License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?pre:pre%{pre}}.tar.gz
 Patch0:           bcfg2-serverinitsubsys.patch
+Patch1:           0001-Fix-name-issue-caused-YUMng-failure.patch
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -69,6 +70,7 @@ Configuration management server
 %prep
 %setup -q -n bcfg2-%{version}%{?pre:pre%{pre}}
 %patch0 -p0 -b .serverinitsubsys
+%patch0 -p1 -b .yumng
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/buildsys/common/bcfg2.init
@@ -202,6 +204,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Wed Jun 27 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-3
+- Add patch to fix YUMng problem
+
 * Mon Jun 25 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-2
 - Bump revision and rebuild
 
