@@ -4,7 +4,7 @@
 
 Name:             bcfg2
 Version:          0.9.4
-Release:          3%{?pre:.pre%{pre}}%{?dist}
+Release:          4%{?pre:.pre%{pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -70,7 +70,7 @@ Configuration management server
 %prep
 %setup -q -n bcfg2-%{version}%{?pre:pre%{pre}}
 %patch0 -p0 -b .serverinitsubsys
-%patch0 -p1 -b .yumng
+%patch1 -p1 -b .yumng
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/buildsys/common/bcfg2.init
@@ -204,6 +204,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Wed Jun 27 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-4
+- Oops, apply right patch
+
 * Wed Jun 27 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-3
 - Add patch to fix YUMng problem
 
