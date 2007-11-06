@@ -1,0 +1,59 @@
+diff --git a/src/lib/Server/Plugins/TGenshi.py b/src/lib/Server/Plugins/TGenshi.py
+index 5867797..7855763 100644
+--- a/src/lib/Server/Plugins/TGenshi.py
++++ b/src/lib/Server/Plugins/TGenshi.py
+@@ -1,6 +1,8 @@
+ '''This module implements a templating generator based on Genshi'''
+ __revision__ = '$Revision$'
+ 
++import os
++
+ from genshi.template import TemplateLoader, TextTemplate, MarkupTemplate, TemplateError
+ import logging, lxml.etree, posixpath, re, os
+ import Bcfg2.Server.Plugin
+@@ -18,23 +20,25 @@ class TemplateFile:
+         self.properties = properties
+         self.loader = loader
+         
+-    def HandleEvent(self, event):
++    def HandleEvent(self, data, event):
+         '''Handle all fs events for this template'''
+         if event.filename in ['template.xml', 'template.txt']:
+             try:
++                fpath = os.path.join(self.name[1:], event.filename)
+                 if event.filename.endswith('.txt'):
+-                    self.template = self.loader.load(os.path.join(self.name[1:], event.filename), cls=TextTemplate)
++                    self.template = self.loader.load(fpath, cls=TextTemplate)
+                 else:
+-                    self.template = self.loader.load(os.path.join(self.name[1:], event.filename), cls=MarkupTemplate)
++                    self.template = self.loader.load(fpath, cls=MarkupTemplate)
+             except TemplateError, terror:
+                 logger.error('Genshi template error: %s' % terror)
+         elif event.filename == 'info.xml':
+             if not hasattr(self, 'infoxml'):
+-                fpath = self.name + '/info.xml'
++                fpath = os.path.join(os.path.join(data, self.name[1:]), 'info.xml')
+                 self.infoxml = Bcfg2.Server.Plugin.XMLSrc(fpath, True)
+             self.infoxml.HandleEvent(event)    
+         elif event.filename == 'info':
+-            for line in open(self.name + '/info').readlines():
++            fpath = os.path.join(os.path.join(data, self.name[1:]), 'info')
++            for line in open(fpath).readlines():
+                 match = info.match(line)
+                 if not match:
+                     logger.warning("Failed to match line: %s"%line)
+@@ -134,12 +138,12 @@ class TGenshi(Bcfg2.Server.Plugin.Plugin):
+                 if not self.entries.has_key(identifier):
+                     self.entries[identifier] = TemplateFile(identifier, self.loader, self.properties)
+                     self.Entries['ConfigFile'][identifier] = self.BuildEntry
+-                self.entries[identifier].HandleEvent(event)
++                self.entries[identifier].HandleEvent(self.data, event)
+             else:
+                 logger.info('Not creating template for %s' % identifier)
+         elif action == 'changed':
+             if self.entries.has_key(identifier):
+-                self.entries[identifier].HandleEvent(event)
++                self.entries[identifier].HandleEvent(self.data, event)
+         elif action == 'deleted':
+             if event.filename in ['template.xml', 'template.txt'] and self.entries.has_key(identifier):
+                 del self.entries[identifier]

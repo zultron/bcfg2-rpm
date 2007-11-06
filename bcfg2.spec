@@ -4,7 +4,7 @@
 
 Name:             bcfg2
 Version:          0.9.5
-Release:          0.4%{?pre:.pre%{pre}}%{?dist}
+Release:          0.5%{?pre:.pre%{pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -213,6 +213,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Nov 05 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5-0.5.pre7
+- Commit new patches to CVS.
+
 * Mon Nov 05 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5-0.4.pre7
 - Update to 0.9.5pre7
 
