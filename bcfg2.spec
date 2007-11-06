@@ -1,10 +1,10 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-#define pre 4
+%define pre 7
 
 Name:             bcfg2
-Version:          0.9.4
-Release:          4%{?pre:.pre%{pre}}%{?dist}
+Version:          0.9.5
+Release:          0.4%{?pre:.pre%{pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -12,7 +12,8 @@ License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?pre:pre%{pre}}.tar.gz
 Patch0:           bcfg2-serverinitsubsys.patch
-Patch1:           0001-Fix-name-issue-caused-YUMng-failure.patch
+
+Patch1:           bcfg2-0.9.5pre4-tgenshi.patch
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -59,6 +60,8 @@ Requires:         /usr/sbin/sendmail
 Requires:         /usr/bin/openssl
 Requires:         gamin-python
 Requires:         redhat-lsb
+Requires:         python-genshi
+Requires:         python-cheetah
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
@@ -70,7 +73,9 @@ Configuration management server
 %prep
 %setup -q -n bcfg2-%{version}%{?pre:pre%{pre}}
 %patch0 -p0 -b .serverinitsubsys
-%patch1 -p1 -b .yumng
+%patch1 -p1
+#patch2 -p1
+#patch3 -p1
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/buildsys/common/bcfg2.init
@@ -164,6 +169,7 @@ fi
 %dir %{python_sitelib}/Bcfg2
 %{python_sitelib}/Bcfg2/__init__.*
 %{python_sitelib}/Bcfg2/Client
+%{python_sitelib}/Bcfg2/Component.*
 %{python_sitelib}/Bcfg2/Logging.*
 %{python_sitelib}/Bcfg2/Options.*
 %{python_sitelib}/Bcfg2/tlslite
@@ -193,17 +199,23 @@ fi
 %{_sbindir}/bcfg2-ping-sweep
 %{_sbindir}/bcfg2-query
 %{_sbindir}/bcfg2-repo-validate
+%{_sbindir}/bcfg2-remote
 %{_sbindir}/bcfg2-server
 
 %{_mandir}/man8/bcfg2-admin.8*
 %{_mandir}/man8/bcfg2-build-reports.8*
 %{_mandir}/man8/bcfg2-info.8*
+%{_mandir}/man8/bcfg2-query.8*
 %{_mandir}/man8/bcfg2-repo-validate.8*
+%{_mandir}/man8/bcfg2-remote.8*
 %{_mandir}/man8/bcfg2-server.8*
 
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Nov 05 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5-0.4.pre7
+- Update to 0.9.5pre7
+
 * Wed Jun 27 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.4-4
 - Oops, apply right patch
 
