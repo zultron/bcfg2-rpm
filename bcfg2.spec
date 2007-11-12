@@ -2,7 +2,7 @@
 
 Name:             bcfg2
 Version:          0.9.5
-Release:          1{?dist}
+Release:          2%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -209,6 +209,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Nov 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5-2
+- Fix oops.
+
 * Mon Nov 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5-1
 - Update to 0.9.5 final.
 
