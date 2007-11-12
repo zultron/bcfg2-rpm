@@ -1,16 +1,14 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-%define pre 7
-
 Name:             bcfg2
 Version:          0.9.5
-Release:          0.5%{?pre:.pre%{pre}}%{?dist}
+Release:          1{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?pre:pre%{pre}}.tar.gz
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
 Patch0:           bcfg2-serverinitsubsys.patch
 
 Patch1:           bcfg2-0.9.5pre4-tgenshi.patch
@@ -71,11 +69,9 @@ Requires(postun): /sbin/service
 Configuration management server
 
 %prep
-%setup -q -n bcfg2-%{version}%{?pre:pre%{pre}}
+%setup -q
 %patch0 -p0 -b .serverinitsubsys
 %patch1 -p1
-#patch2 -p1
-#patch3 -p1
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/buildsys/common/bcfg2.init
@@ -213,6 +209,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Nov 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5-1
+- Update to 0.9.5 final.
+
 * Mon Nov 05 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5-0.5.pre7
 - Commit new patches to CVS.
 
