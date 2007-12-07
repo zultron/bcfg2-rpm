@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:             bcfg2
-Version:          0.9.5
-Release:          2%{?dist}
+Version:          0.9.5.2
+Release:          1%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -209,6 +209,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Nov 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5.2-1
+- Update to 0.9.5.2
+
 * Mon Nov 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5-2
 - Fix oops.
 
