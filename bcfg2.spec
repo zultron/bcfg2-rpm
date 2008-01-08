@@ -1,7 +1,7 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:             bcfg2
-Version:          0.9.5.2
+Version:          0.9.5.3
 Release:          1%{?dist}
 Summary:          Configuration management system
 
@@ -17,7 +17,12 @@ BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:        noarch
 
-BuildRequires:    python-devel
+%if 0%{?fedora} >= 8
+BuildRequires: python-setuptools-devel
+%else
+BuildRequires: python-setuptools
+%endif
+
 Requires:         python-lxml
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
@@ -91,11 +96,11 @@ do
 done
 
 %build
-%{__python} setup.py build
+%{__python} -c 'import setuptools; execfile("setup.py")' build
 
 %install
 rm -rf %{buildroot}
-%{__python} setup.py install -O1 --skip-build --root %{buildroot}
+%{__python} -c 'import setuptools; execfile("setup.py")' install --skip-build --root %{buildroot}
 
 mkdir -p %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_initrddir}
@@ -185,6 +190,7 @@ fi
 
 %{_initrddir}/bcfg2-server
 
+%{python_sitelib}/Bcfg2.Server*.egg-info
 %{python_sitelib}/Bcfg2/Server
 
 %{_datadir}/bcfg2
@@ -209,6 +215,10 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Tue Jan  8 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5.3-1
+- Update to 0.9.5.3
+- Package egg-info files.
+
 * Mon Nov 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5.2-1
 - Update to 0.9.5.2
 
