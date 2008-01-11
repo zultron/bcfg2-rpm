@@ -1,7 +1,7 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:             bcfg2
-Version:          0.9.5.4
+Version:          0.9.5.5
 Release:          1%{?dist}
 Summary:          Configuration management system
 
@@ -167,6 +167,7 @@ fi
 
 %{_initrddir}/bcfg2
 
+%{python_sitelib}/Bcfg2*.egg-info
 %dir %{python_sitelib}/Bcfg2
 %{python_sitelib}/Bcfg2/__init__.*
 %{python_sitelib}/Bcfg2/Client
@@ -190,7 +191,6 @@ fi
 
 %{_initrddir}/bcfg2-server
 
-%{python_sitelib}/Bcfg2.Server*.egg-info
 %{python_sitelib}/Bcfg2/Server
 
 %{_datadir}/bcfg2
@@ -215,6 +215,10 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Fri Jan 11 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5.5-1
+- Update to 0.9.5.5
+- More egg-info entries.
+
 * Wed Jan  9 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5.4-1
 - Update to 0.9.5.4.
 
