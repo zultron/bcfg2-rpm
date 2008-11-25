@@ -1,17 +1,16 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
+#define pre 3
+
 Name:             bcfg2
-Version:          0.9.5.7
-Release:          1%{?dist}
+Version:          0.9.6
+Release:          1%{?pre:.pre%{pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
-Patch0:           bcfg2-serverinitsubsys.patch
-
-Patch1:           bcfg2-0.9.5pre4-tgenshi.patch
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?pre:pre%{pre}}.tar.gz
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -74,9 +73,7 @@ Requires(postun): /sbin/service
 Configuration management server
 
 %prep
-%setup -q
-%patch0 -p0 -b .serverinitsubsys
-%patch1 -p1
+%setup -q -n %{name}-%{version}%{?pre:pre%{pre}}
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/buildsys/common/bcfg2.init
@@ -157,7 +154,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS ChangeLog doc examples COPYRIGHT README
+%doc AUTHORS ChangeLog examples COPYRIGHT README
 
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.conf
 
@@ -172,8 +169,10 @@ fi
 %{python_sitelib}/Bcfg2/__init__.*
 %{python_sitelib}/Bcfg2/Client
 %{python_sitelib}/Bcfg2/Component.*
-%{python_sitelib}/Bcfg2/Logging.*
+%{python_sitelib}/Bcfg2/Daemon.*
+%{python_sitelib}/Bcfg2/Logger.*
 %{python_sitelib}/Bcfg2/Options.*
+%{python_sitelib}/Bcfg2/Proxy.*
 %{python_sitelib}/Bcfg2/tlslite
 
 %{_sbindir}/bcfg2
@@ -199,15 +198,14 @@ fi
 %{_sbindir}/bcfg2-build-reports
 %{_sbindir}/bcfg2-info
 %{_sbindir}/bcfg2-ping-sweep
-%{_sbindir}/bcfg2-query
 %{_sbindir}/bcfg2-repo-validate
 %{_sbindir}/bcfg2-remote
+%{_sbindir}/bcfg2-reports
 %{_sbindir}/bcfg2-server
 
 %{_mandir}/man8/bcfg2-admin.8*
 %{_mandir}/man8/bcfg2-build-reports.8*
 %{_mandir}/man8/bcfg2-info.8*
-%{_mandir}/man8/bcfg2-query.8*
 %{_mandir}/man8/bcfg2-repo-validate.8*
 %{_mandir}/man8/bcfg2-remote.8*
 %{_mandir}/man8/bcfg2-server.8*
@@ -215,6 +213,21 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Tue Nov 18 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.6-1
+- Update to 0.9.6 final.
+
+* Tue Oct 14 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.6-0.8.pre3
+- Update to 0.9.6pre3
+
+* Sat Aug  9 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.6-0.2.pre2
+- Update to 0.9.6pre2
+
+* Wed May 28 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.6-0.1.pre1
+- Update to 0.9.6pre1
+
+* Fri Feb 15 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5.7-1
+- Update to 0.9.5.7.
+
 * Fri Feb 15 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.5.7-1
 - Update to 0.9.5.7.
 
