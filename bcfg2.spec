@@ -4,7 +4,7 @@
 
 Name:             bcfg2
 Version:          0.9.6
-Release:          1%{?pre:.pre%{pre}}%{?dist}
+Release:          2%{?pre:.pre%{pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -213,6 +213,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Sat Nov 29 2008 Ignacio Vazquez-Abrams <ivazqueznet+rpm@gmail.com> - 0.9.6-2
+- Rebuild for Python 2.6
+
 * Tue Nov 18 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.9.6-1
 - Update to 0.9.6 final.
 
