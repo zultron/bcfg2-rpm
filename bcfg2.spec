@@ -4,7 +4,7 @@
 
 Name:             bcfg2
 Version:          0.9.6
-Release:          3%{?pre:.pre%{pre}}%{?dist}
+Release:          4%{?pre:.pre%{pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -213,6 +213,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
 * Mon Feb 23 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.6-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
