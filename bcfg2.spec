@@ -1,16 +1,16 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-#define pre 3
+%define _rc 1
 
 Name:             bcfg2
-Version:          0.9.6
-Release:          4%{?pre:.pre%{pre}}%{?dist}
+Version:          1.0.0
+Release:          0.2%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?pre:pre%{pre}}.tar.gz
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -23,6 +23,8 @@ BuildRequires: python-setuptools
 %endif
 
 Requires:         python-lxml
+Requires:	  python-ssl
+
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
@@ -73,7 +75,7 @@ Requires(postun): /sbin/service
 Configuration management server
 
 %prep
-%setup -q -n %{name}-%{version}%{?pre:pre%{pre}}
+%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/buildsys/common/bcfg2.init
@@ -169,11 +171,13 @@ fi
 %{python_sitelib}/Bcfg2/__init__.*
 %{python_sitelib}/Bcfg2/Client
 %{python_sitelib}/Bcfg2/Component.*
-%{python_sitelib}/Bcfg2/Daemon.*
+#%{python_sitelib}/Bcfg2/Daemon.*
 %{python_sitelib}/Bcfg2/Logger.*
 %{python_sitelib}/Bcfg2/Options.*
 %{python_sitelib}/Bcfg2/Proxy.*
-%{python_sitelib}/Bcfg2/tlslite
+%{python_sitelib}/Bcfg2/SSLServer.*
+%{python_sitelib}/Bcfg2/Statistics.*
+#%{python_sitelib}/Bcfg2/tlslite
 
 %{_sbindir}/bcfg2
 %{_mandir}/man1/bcfg2.1*
@@ -199,7 +203,7 @@ fi
 %{_sbindir}/bcfg2-info
 %{_sbindir}/bcfg2-ping-sweep
 %{_sbindir}/bcfg2-repo-validate
-%{_sbindir}/bcfg2-remote
+#%{_sbindir}/bcfg2-remote
 %{_sbindir}/bcfg2-reports
 %{_sbindir}/bcfg2-server
 
@@ -207,12 +211,21 @@ fi
 %{_mandir}/man8/bcfg2-build-reports.8*
 %{_mandir}/man8/bcfg2-info.8*
 %{_mandir}/man8/bcfg2-repo-validate.8*
-%{_mandir}/man8/bcfg2-remote.8*
+#%{_mandir}/man8/bcfg2-remote.8*
 %{_mandir}/man8/bcfg2-server.8*
 
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Oct 26 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-0.3.rc1
+- Update to 1.0rc1
+
+* Fri Oct 16 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0-0.2.pre5
+- Add python-ssl requirement
+
+* Tue Aug 11 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0-0.1.pre5
+- Update to 1.0pre5
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.6-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
