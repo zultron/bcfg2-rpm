@@ -1,10 +1,10 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-%define _rc 1
+%define _rc 2
 
 Name:             bcfg2
 Version:          1.0.0
-Release:          0.2%{?_rc:.rc%{_rc}}%{?dist}
+Release:          0.4%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -78,15 +78,15 @@ Configuration management server
 %setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
 
 # fixup some paths
-%{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/buildsys/common/bcfg2.init
+%{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' tools/bcfg2-cron
 
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.daily
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.hourly
 
 # don't start servers by default
-%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/buildsys/common/bcfg2.init
-%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/buildsys/common/bcfg2-server.init
+%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/bcfg2.init
+%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/bcfg2-server.init
 
 # get rid of extraneous shebangs
 for f in `find src/lib -name \*.py`
@@ -112,8 +112,8 @@ mkdir -p %{buildroot}%{_var}/cache/bcfg2
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
-install -m 755 debian/buildsys/common/bcfg2.init %{buildroot}%{_initrddir}/bcfg2
-install -m 755 debian/buildsys/common/bcfg2-server.init %{buildroot}%{_initrddir}/bcfg2-server
+install -m 755 debian/bcfg2.init %{buildroot}%{_initrddir}/bcfg2
+install -m 755 debian/bcfg2-server.init %{buildroot}%{_initrddir}/bcfg2-server
 install -m 755 debian/bcfg2.cron.daily %{buildroot}%{_sysconfdir}/cron.daily/bcfg2
 install -m 755 debian/bcfg2.cron.hourly %{buildroot}%{_sysconfdir}/cron.hourly/bcfg2
 install -m 755 tools/bcfg2-cron %{buildroot}%{_libexecdir}/bcfg2-cron
@@ -217,6 +217,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Sat Oct 31 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-0.4.rc2
+- Update to 1.0.0rc2
+
 * Mon Oct 26 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-0.3.rc1
 - Update to 1.0rc1
 
