@@ -4,7 +4,7 @@
 
 Name:             bcfg2
 Version:          1.0.0
-Release:          1%{?_rc:.rc%{_rc}}%{?dist}
+Release:          2%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -82,6 +82,7 @@ Configuration management server
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
+%{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2-server.init
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' tools/bcfg2-cron
 
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.daily
@@ -122,6 +123,7 @@ install -m 755 debian/bcfg2.cron.hourly %{buildroot}%{_sysconfdir}/cron.hourly/b
 install -m 755 tools/bcfg2-cron %{buildroot}%{_libexecdir}/bcfg2-cron
 
 install -m 644 debian/bcfg2.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2
+install -m 644 debian/bcfg2-server.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2-server
 
 touch %{buildroot}%{_sysconfdir}/bcfg2.cert
 touch %{buildroot}%{_sysconfdir}/bcfg2.conf
@@ -195,6 +197,8 @@ fi
 
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.key
 
+%config(noreplace) %{_sysconfdir}/sysconfig/bcfg2-server
+
 %{_initrddir}/bcfg2-server
 
 %{python_sitelib}/Bcfg2/Server
@@ -218,6 +222,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Fri Nov  6 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-2:.rc%{_rc}}%{?dist}
+- Fixup the bcfg2-server init script
+
 * Fri Nov  6 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-1
 - Update to 1.0.0 final
 
