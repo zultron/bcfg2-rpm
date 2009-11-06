@@ -1,16 +1,17 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-%define _rc 2
+#define _rc 4
 
 Name:             bcfg2
 Version:          1.0.0
-Release:          0.4%{?_rc:.rc%{_rc}}%{?dist}
+Release:          1%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
+Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -23,7 +24,9 @@ BuildRequires: python-setuptools
 %endif
 
 Requires:         python-lxml
+%if 0%{?epel} > 0
 Requires:	  python-ssl
+%endif
 
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
@@ -120,6 +123,7 @@ install -m 755 tools/bcfg2-cron %{buildroot}%{_libexecdir}/bcfg2-cron
 
 install -m 644 debian/bcfg2.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2
 
+touch %{buildroot}%{_sysconfdir}/bcfg2.cert
 touch %{buildroot}%{_sysconfdir}/bcfg2.conf
 touch %{buildroot}%{_sysconfdir}/bcfg2.key
 
@@ -158,6 +162,7 @@ fi
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog examples COPYRIGHT README
 
+%ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.cert
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2
@@ -171,13 +176,11 @@ fi
 %{python_sitelib}/Bcfg2/__init__.*
 %{python_sitelib}/Bcfg2/Client
 %{python_sitelib}/Bcfg2/Component.*
-#%{python_sitelib}/Bcfg2/Daemon.*
 %{python_sitelib}/Bcfg2/Logger.*
 %{python_sitelib}/Bcfg2/Options.*
 %{python_sitelib}/Bcfg2/Proxy.*
 %{python_sitelib}/Bcfg2/SSLServer.*
 %{python_sitelib}/Bcfg2/Statistics.*
-#%{python_sitelib}/Bcfg2/tlslite
 
 %{_sbindir}/bcfg2
 %{_mandir}/man1/bcfg2.1*
@@ -203,7 +206,6 @@ fi
 %{_sbindir}/bcfg2-info
 %{_sbindir}/bcfg2-ping-sweep
 %{_sbindir}/bcfg2-repo-validate
-#%{_sbindir}/bcfg2-remote
 %{_sbindir}/bcfg2-reports
 %{_sbindir}/bcfg2-server
 
@@ -211,12 +213,17 @@ fi
 %{_mandir}/man8/bcfg2-build-reports.8*
 %{_mandir}/man8/bcfg2-info.8*
 %{_mandir}/man8/bcfg2-repo-validate.8*
-#%{_mandir}/man8/bcfg2-remote.8*
 %{_mandir}/man8/bcfg2-server.8*
 
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Fri Nov  6 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-1
+- Update to 1.0.0 final
+
+* Wed Nov  4 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-0.5.rc2
+- Only require python-ssl on EPEL
+
 * Sat Oct 31 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-0.4.rc2
 - Update to 1.0.0rc2
 
