@@ -1,10 +1,10 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-#global _rc 4
+%global _rc 1
 
 Name:             bcfg2
-Version:          1.0.1
-Release:          1%{?_rc:.rc%{_rc}}%{?dist}
+Version:          1.1.0
+Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -222,6 +222,36 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Wed Apr 28 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-0.1.rc1
+- Update to 1.1.0rc1
+- 
+- * Deprecate old-style server POSIX types
+- 
+-  You will now need to specify Path entries in the bcfg2 server
+-  configuration instead of the old ConfigFile, Directory, SymLink
+-  entries. A tool for helping you transition existing configurations
+-  can be found at:
+- 
+-      https://trac.mcs.anl.gov/projects/bcfg2/browser/tags/bcfg2_1_1_0rc1/tools/posixunified.py
+- 
+-  Compatibility with older clients is maintained through the use of
+-  the new POSIXCompat plugin which transforms the new Path entries to
+-  their older equivalents.
+- 
+- * New Sphinx documentation
+- 
+-  We have migrated user documentation to Sphinx. Information about
+-  building the documentation from the Bcfg2 source can be found at:
+- 
+-      https://trac.mcs.anl.gov/projects/bcfg2/wiki/Manual
+- 
+- * Migrate git plugin to Dulwich
+- * New detailed client view and other improvements in Django reports
+- * Encap removed
+- * New OS X packaging
+- * New Upstart client tool
+- * Migrate Hostbase to Django 1.1
+
 * Tue Apr 13 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.1-1
 - Update to final version
 
