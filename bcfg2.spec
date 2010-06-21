@@ -1,6 +1,8 @@
-%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%if ! (0%{?fedora} > 12 || 0%{?rhel} > 5)
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%endif
 
-%global _rc 1
+%global _rc 3
 
 Name:             bcfg2
 Version:          1.1.0
@@ -69,6 +71,7 @@ Requires:         gamin-python
 Requires:         redhat-lsb
 Requires:         python-genshi
 Requires:         python-cheetah
+Requires:         graphviz
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
@@ -192,6 +195,7 @@ fi
 
 %dir %{_var}/cache/bcfg2
 
+
 %files server
 %defattr(-,root,root,-)
 
@@ -222,6 +226,13 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Sat Jun 19 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.1.rc3
+- Updated to new upstream release candidate RC3 
+
+* Sun May 02 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.2.rc1
+- Changed define to global
+- Added graphviz for the server package
+
 * Wed Apr 28 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-0.1.rc1
 - Update to 1.1.0rc1
 - 
