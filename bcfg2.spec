@@ -2,7 +2,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %endif
 
-%global _rc 3
+%global _rc 4
 
 Name:             bcfg2
 Version:          1.1.0
@@ -14,9 +14,7 @@ License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
-
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
 BuildArch:        noarch
 
 %if 0%{?fedora} >= 8
@@ -226,6 +224,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Tue Jul 20 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.1.rc4
+- Updated to new upstream release candidate RC4
+
 * Sat Jun 19 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.1.rc3
 - Updated to new upstream release candidate RC3 
 
