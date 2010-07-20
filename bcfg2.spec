@@ -6,7 +6,7 @@
 
 Name:             bcfg2
 Version:          1.1.0
-Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
+Release:          1.1%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -14,6 +14,7 @@ License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
+Patch0:           tgenshi-indent.patch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
 
@@ -32,6 +33,7 @@ Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
+
 
 %description
 Bcfg2 helps system administrators produce a consistent, reproducible,
@@ -80,6 +82,7 @@ Configuration management server
 
 %prep
 %setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
+%patch0 -p0 -b .indent 
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -224,6 +227,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Tue Jul 20 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-1.1.rc4
+- Added patch to fix indention
+
 * Tue Jul 20 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.1.rc4
 - Updated to new upstream release candidate RC4
 
