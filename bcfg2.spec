@@ -6,7 +6,7 @@
 
 Name:             bcfg2
 Version:          1.1.0
-Release:          1.1%{?_rc:.rc%{_rc}}%{?dist}
+Release:          1.1%{?_rc:.rc%{_rc}}%{?dist}.1
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -227,6 +227,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 1.1.0-1.1.rc4.1
+- Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
+
 * Tue Jul 20 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-1.1.rc4
 - Added patch to fix indention
 
