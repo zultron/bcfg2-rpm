@@ -1,19 +1,21 @@
-%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%if ! (0%{?fedora} > 12 || 0%{?rhel} > 5)
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%endif
 
-#define pre 3
+%global _rc 4
 
 Name:             bcfg2
-Version:          0.9.6
-Release:          4%{?pre:.pre%{pre}}%{?dist}
+Version:          1.1.0
+Release:          1.1%{?_rc:.rc%{_rc}}%{?dist}.1
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?pre:pre%{pre}}.tar.gz
-
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
+Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
+Patch0:           tgenshi-indent.patch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
 BuildArch:        noarch
 
 %if 0%{?fedora} >= 8
@@ -23,10 +25,15 @@ BuildRequires: python-setuptools
 %endif
 
 Requires:         python-lxml
+%if 0%{?epel} > 0
+Requires:	  python-ssl
+%endif
+
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
+
 
 %description
 Bcfg2 helps system administrators produce a consistent, reproducible,
@@ -64,6 +71,7 @@ Requires:         gamin-python
 Requires:         redhat-lsb
 Requires:         python-genshi
 Requires:         python-cheetah
+Requires:         graphviz
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
@@ -73,18 +81,20 @@ Requires(postun): /sbin/service
 Configuration management server
 
 %prep
-%setup -q -n %{name}-%{version}%{?pre:pre%{pre}}
+%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
+%patch0 -p0 -b .indent 
 
 # fixup some paths
-%{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/buildsys/common/bcfg2.init
+%{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
+%{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2-server.init
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' tools/bcfg2-cron
 
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.daily
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.hourly
 
 # don't start servers by default
-%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/buildsys/common/bcfg2.init
-%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/buildsys/common/bcfg2-server.init
+%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/bcfg2.init
+%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/bcfg2-server.init
 
 # get rid of extraneous shebangs
 for f in `find src/lib -name \*.py`
@@ -110,14 +120,16 @@ mkdir -p %{buildroot}%{_var}/cache/bcfg2
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
-install -m 755 debian/buildsys/common/bcfg2.init %{buildroot}%{_initrddir}/bcfg2
-install -m 755 debian/buildsys/common/bcfg2-server.init %{buildroot}%{_initrddir}/bcfg2-server
+install -m 755 debian/bcfg2.init %{buildroot}%{_initrddir}/bcfg2
+install -m 755 debian/bcfg2-server.init %{buildroot}%{_initrddir}/bcfg2-server
 install -m 755 debian/bcfg2.cron.daily %{buildroot}%{_sysconfdir}/cron.daily/bcfg2
 install -m 755 debian/bcfg2.cron.hourly %{buildroot}%{_sysconfdir}/cron.hourly/bcfg2
 install -m 755 tools/bcfg2-cron %{buildroot}%{_libexecdir}/bcfg2-cron
 
 install -m 644 debian/bcfg2.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2
+install -m 644 debian/bcfg2-server.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2-server
 
+touch %{buildroot}%{_sysconfdir}/bcfg2.cert
 touch %{buildroot}%{_sysconfdir}/bcfg2.conf
 touch %{buildroot}%{_sysconfdir}/bcfg2.key
 
@@ -156,6 +168,7 @@ fi
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog examples COPYRIGHT README
 
+%ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.cert
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2
@@ -169,11 +182,11 @@ fi
 %{python_sitelib}/Bcfg2/__init__.*
 %{python_sitelib}/Bcfg2/Client
 %{python_sitelib}/Bcfg2/Component.*
-%{python_sitelib}/Bcfg2/Daemon.*
 %{python_sitelib}/Bcfg2/Logger.*
 %{python_sitelib}/Bcfg2/Options.*
 %{python_sitelib}/Bcfg2/Proxy.*
-%{python_sitelib}/Bcfg2/tlslite
+%{python_sitelib}/Bcfg2/SSLServer.*
+%{python_sitelib}/Bcfg2/Statistics.*
 
 %{_sbindir}/bcfg2
 %{_mandir}/man1/bcfg2.1*
@@ -183,10 +196,13 @@ fi
 
 %dir %{_var}/cache/bcfg2
 
+
 %files server
 %defattr(-,root,root,-)
 
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.key
+
+%config(noreplace) %{_sysconfdir}/sysconfig/bcfg2-server
 
 %{_initrddir}/bcfg2-server
 
@@ -199,7 +215,6 @@ fi
 %{_sbindir}/bcfg2-info
 %{_sbindir}/bcfg2-ping-sweep
 %{_sbindir}/bcfg2-repo-validate
-%{_sbindir}/bcfg2-remote
 %{_sbindir}/bcfg2-reports
 %{_sbindir}/bcfg2-server
 
@@ -207,12 +222,81 @@ fi
 %{_mandir}/man8/bcfg2-build-reports.8*
 %{_mandir}/man8/bcfg2-info.8*
 %{_mandir}/man8/bcfg2-repo-validate.8*
-%{_mandir}/man8/bcfg2-remote.8*
 %{_mandir}/man8/bcfg2-server.8*
 
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 1.1.0-1.1.rc4.1
+- Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
+
+* Tue Jul 20 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-1.1.rc4
+- Added patch to fix indention
+
+* Tue Jul 20 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.1.rc4
+- Updated to new upstream release candidate RC4
+
+* Sat Jun 19 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.1.rc3
+- Updated to new upstream release candidate RC3 
+
+* Sun May 02 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.2.rc1
+- Changed define to global
+- Added graphviz for the server package
+
+* Wed Apr 28 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-0.1.rc1
+- Update to 1.1.0rc1
+- 
+- * Deprecate old-style server POSIX types
+- 
+-  You will now need to specify Path entries in the bcfg2 server
+-  configuration instead of the old ConfigFile, Directory, SymLink
+-  entries. A tool for helping you transition existing configurations
+-  can be found at:
+- 
+-      https://trac.mcs.anl.gov/projects/bcfg2/browser/tags/bcfg2_1_1_0rc1/tools/posixunified.py
+- 
+-  Compatibility with older clients is maintained through the use of
+-  the new POSIXCompat plugin which transforms the new Path entries to
+-  their older equivalents.
+- 
+- * New Sphinx documentation
+- 
+-  We have migrated user documentation to Sphinx. Information about
+-  building the documentation from the Bcfg2 source can be found at:
+- 
+-      https://trac.mcs.anl.gov/projects/bcfg2/wiki/Manual
+- 
+- * Migrate git plugin to Dulwich
+- * New detailed client view and other improvements in Django reports
+- * Encap removed
+- * New OS X packaging
+- * New Upstart client tool
+- * Migrate Hostbase to Django 1.1
+
+* Tue Apr 13 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.1-1
+- Update to final version
+
+* Fri Nov  6 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-2
+- Fixup the bcfg2-server init script
+
+* Fri Nov  6 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-1
+- Update to 1.0.0 final
+
+* Wed Nov  4 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-0.5.rc2
+- Only require python-ssl on EPEL
+
+* Sat Oct 31 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-0.4.rc2
+- Update to 1.0.0rc2
+
+* Mon Oct 26 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0.0-0.3.rc1
+- Update to 1.0rc1
+
+* Fri Oct 16 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0-0.2.pre5
+- Add python-ssl requirement
+
+* Tue Aug 11 2009 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.0-0.1.pre5
+- Update to 1.0pre5
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.6-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
