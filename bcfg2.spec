@@ -6,7 +6,7 @@
 
 Name:             bcfg2
 Version:          1.1.0
-Release:          1.1%{?_rc:.rc%{_rc}}%{?dist}.1
+Release:          1.2%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -14,6 +14,7 @@ License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
+Source2:	  YUMng.py
 Patch0:           tgenshi-indent.patch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
@@ -33,7 +34,6 @@ Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
-
 
 %description
 Bcfg2 helps system administrators produce a consistent, reproducible,
@@ -83,6 +83,7 @@ Configuration management server
 %prep
 %setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
 %patch0 -p0 -b .indent 
+%{__cp} %{S:2} src/lib/Client/Tools
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -196,7 +197,6 @@ fi
 
 %dir %{_var}/cache/bcfg2
 
-
 %files server
 %defattr(-,root,root,-)
 
@@ -227,6 +227,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Tue Aug 31 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-1.2.rc4
+- Add new YUMng driver
+
 * Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 1.1.0-1.1.rc4.1
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 
