@@ -2,11 +2,11 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %endif
 
-%global _rc 4
+%global _rc 5
 
 Name:             bcfg2
 Version:          1.1.0
-Release:          1.2%{?_rc:.rc%{_rc}}%{?dist}
+Release:          1.3%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -14,8 +14,6 @@ License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
-Source2:	  YUMng.py
-Patch0:           tgenshi-indent.patch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
 
@@ -82,8 +80,6 @@ Configuration management server
 
 %prep
 %setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
-%patch0 -p0 -b .indent 
-%{__cp} %{S:2} src/lib/Client/Tools
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -227,6 +223,105 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Wed Sep 15 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-1.3.rc5
+- Update to 1.1.0rc5:
+-
+- Packages:
+-  - Assign the deps variable before resolution.
+-  - Allow xinclude and add XML error handling
+-  - Remove log line from black/whitelist test
+-  - Allow for whitelisting
+-   Patch from IRConan to allow for whitelisted packages in
+-   sources.
+-  - Treat blacklisted packages as if they don't exist
+-   Currently a blacklisted package stops further source processing.
+-   This prevents any other sources from defining a good package.
+-  - Document new knobs and added schema validator
+-  - Move knobs to config.xml
+-  - Resolver/Metadata options
+-   Patch from Jack Neely to add enable/disable options to the resolver
+-   and metadata pareser.
+-  - Allow soft relaods and use a checksum for cache file.
+-   Use checksum for cache file.
+-   Allow reloads of config.xml and sources without downloading everything.
+-   Merged config.xml and source processing into a single function.
+-  - Expose repo data as a Connector
+-  - fix type conflict
+-  - invalidate virt_pkgs cache when source data is reloaded
+-  - dep resolver rewrite
+-   Fix dep resolver to take all providers of a dependency into consideration.
+-   Rewrite resolver to be simpler at the same time.
+-  - Added support for "apt" and "yum" as non-distro specific magic groups
+-
+- YUMng:
+-  - Better error handling for installs
+-  - Deal with any possible Yum verify exceptions
+-  - patch from Tim Laszlo to handle verifying broken symlinks
+-  - fix bug #931
+-   getinstalledgpg() is an RPMng method and is no longer needed in YUMng.
+-  - Fix Path type='ignore' traceback (Reported by Thomas Ackermann)
+-  - speed improvements, multilib verify bug fixes, configuration knobs
+-   The pkg_checks, pkg_verify, installed_action, version_fail_action, and
+-   verify_fail_action configuration knobs are all wired back up.  Caching
+-   implemented to help speed up the package verify routine.
+-   Work arounds for Yum bug: http://yum.baseurl.org/ticket/573
+-  - Speed improvements, Enable reinstalls
+-   We no longer use RPMng in YUMng.  This improves speed by not calling
+-   prelink as yum takes care of that for us.
+-   Yum can do reinstalls on package verify fail so lets wire that up.
+-  - All gpg-pubkey must be in the proper work queue to be installed.
+-   gpg-pubkeys are not packages, yet we treat them as so.  They require
+-   special handling for all install/upgrades/etc.  This corrects a
+-   condition where gpg-pubkeys were "upgraded" rather than "installed."
+-  - YUMng display classes, always compare string versions of packages.
+-   The package object here can be either a yum PO or a string.  Comparing
+-   strings to POs tracebacks.
+-   Display classes for the YUMng driver
+-  - YUMng re-implementation of VerifyPackage using the Yum API.
+-
+- doc:
+-  - Some clarifications on Decisions plugin.
+-  - Minor fixes to SSHbase documentation
+-  - Style fixes
+-  - Fix hyperlinks
+-  - Add the rest of the altsrc documentation for Ticket #923
+-
+- schema:
+-  - Schema updates for Path type="ignore"
+-  - repo-validate: Validate two levels of Group nesting (Fixes
+-   Ticket #805)
+-
+- Misc:
+-  - bcfg2-repo-validate: Patch from Joe Digilio to fix tb in Ticket #939
+-  - Metadata: Add error message when file monitor fails
+-  - bcfg2.spec.in: Fix lxml requirement for bcfg2 client (Reported by tac on IRC)
+-  - Tools/__init__.py: Autoload client tools present in the Tools directory
+-  - bcfg2-info: Add IPython support (Patch from Jeff Strunk) for Ticket #921
+-  - BB: Deprecate BB plugin (Resolves Ticket #923)
+-  - bcfg2: Add back the new SSL key options (Fixes Ticket #916)
+-   The man page no longer contains the -K option mentioned in Ticket #908.
+-   This has been removed since [6013]. We still need the key option available
+-   in the client to prevent Ticket #916.
+-  - Added prefix option to [server] section
+-  - fixes for #910
+-  - '-K' is replaced by '--ssl-key'
+-  - SSLServer: handle socket errors on shutdown gracefully (Resolves #907 and #909)
+-  - bcfg2: fix option parsing for ssl key (Resolves Ticket #908)
+-  - Init: Fix traceback from ticket #906
+-  - Harmonised log messages
+-  - debian: Merge in changes from Arto Jantunen
+-  - bcfg2.init: Remove agent mode (no longer exists)
+-  - POSIX.py: Fix hardcoded errno value
+-  - Don't assume python2.5 is being used on successful hashlib import
+-  - Probes: Fix name collapse in case of group specific probes (arch.G20_foo -> arch) (Resolves Ticket #904)
+-  - TGenshi/TCheetah: Add base64 encoding support for files handled by non-Cfg plugins
+-  - bcfg2-server: logger.error doesn't work when bcfg2.conf doesn't exist
+-  - IPS fixups (from RickB)
+-  - DBStats: Fix random mysql errors
+-  - SSLServer: Retry failed writes
+-  - Commit whitelist/blacksupport for glob style entries
+-  - Cfg: Allow pull operations to update info.xml files
+
 * Tue Aug 31 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-1.2.rc4
 - Add new YUMng driver
 
