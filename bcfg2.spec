@@ -2,11 +2,11 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %endif
 
-%global _rc 5
+#global _rc 5
 
 Name:             bcfg2
 Version:          1.1.0
-Release:          1.3%{?_rc:.rc%{_rc}}%{?dist}
+Release:          2%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -223,6 +223,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Sep 27 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-2
+- Update to final version
+
 * Wed Sep 15 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-1.3.rc5
 - Update to 1.1.0rc5:
 -
