@@ -6,7 +6,7 @@
 
 Name:             bcfg2
 Version:          1.1.0
-Release:          2%{?_rc:.rc%{_rc}}%{?dist}
+Release:          3%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -14,6 +14,7 @@ License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
+Patch0:		  bcfg2-py27-auth.patch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
 
@@ -79,7 +80,8 @@ Requires(postun): /sbin/service
 Configuration management server
 
 %prep
-%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
+%setup0 -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
+%patch0 -p1
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -223,6 +225,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Fri Nov  5 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-3
+- Add patch from Gordon Messmer to fix authentication on F14+ (Python 2.7)
+
 * Mon Sep 27 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-2
 - Update to final version
 
