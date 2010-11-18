@@ -6,7 +6,7 @@
 
 Name:             bcfg2
 Version:          1.1.1
-Release:          1%{?_rc:.rc%{_rc}}%{?dist}
+Release:          2%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -165,7 +165,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS ChangeLog examples COPYRIGHT README
+%doc AUTHORS examples COPYRIGHT README
 
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.cert
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.conf
@@ -225,6 +225,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-2
+- Updated doc section (ChangeLog is gone)
+
 * Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-1
 - Updated to new upstream version 1.1.1
 
