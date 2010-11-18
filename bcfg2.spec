@@ -5,8 +5,8 @@
 #global _rc 5
 
 Name:             bcfg2
-Version:          1.1.0
-Release:          3%{?_rc:.rc%{_rc}}%{?dist}
+Version:          1.1.1
+Release:          1%{?_rc:.rc%{_rc}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -14,19 +14,19 @@ License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
-Patch0:		  bcfg2-py27-auth.patch
+Patch0:           bcfg2-py27-auth.patch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
 
 %if 0%{?fedora} >= 8
-BuildRequires: python-setuptools-devel
+BuildRequires:    python-setuptools-devel
 %else
-BuildRequires: python-setuptools
+BuildRequires:    python-setuptools
 %endif
 
 Requires:         python-lxml
 %if 0%{?epel} > 0
-Requires:	  python-ssl
+Requires:	      python-ssl
 %endif
 
 Requires(post):   /sbin/chkconfig
@@ -225,6 +225,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-1
+- Updated to new upstream version 1.1.1
+
 * Fri Nov  5 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-3
 - Add patch from Gordon Messmer to fix authentication on F14+ (Python 2.7)
 
