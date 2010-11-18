@@ -220,11 +220,15 @@ fi
 %{_mandir}/man8/bcfg2-build-reports.8*
 %{_mandir}/man8/bcfg2-info.8*
 %{_mandir}/man8/bcfg2-repo-validate.8*
+%{_mandir}/man8/bcfg2-reports.8*
 %{_mandir}/man8/bcfg2-server.8*
 
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-3
+- Added new man page
+
 * Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-2
 - Updated doc section (ChangeLog is gone)
 
