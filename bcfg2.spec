@@ -226,10 +226,8 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
-* Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-3
-- Added new man page
-
 * Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-2
+- Added new man page
 - Updated doc section (ChangeLog is gone)
 
 * Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-1
