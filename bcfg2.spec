@@ -6,7 +6,7 @@
 
 Name:             bcfg2
 Version:          1.1.1
-Release:          2%{?_rc:.rc%{_rc}}%{?dist}
+Release:          2%{?_rc:.rc%{_rc}}%{?dist}.1
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -226,6 +226,9 @@ fi
 %dir %{_var}/lib/bcfg2
 
 %changelog
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-2.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-2
 - Added new man page
 - Updated doc section (ChangeLog is gone)
