@@ -1,19 +1,24 @@
 %if ! (0%{?fedora} > 12 || 0%{?rhel} > 5)
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %endif
-
-#global _rc 5
+%{!?py_ver: %define py_ver %(%{__python} -c 'import sys;print(sys.version[0:3])')}
+%global pythonversion %{py_ver}
+#%global _rc 1
+%global _pre 1
 
 Name:             bcfg2
-Version:          1.1.1
-Release:          2%{?_rc:.rc%{_rc}}%{?dist}
+Version:          1.2.0
+#Release:          1%{?_rc:.rc%{_rc}}%{?dist}
+Release:          1%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://trac.mcs.anl.gov/projects/bcfg2
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
-Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
+#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
+#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
+Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
 Patch0:           bcfg2-py27-auth.patch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
@@ -79,9 +84,20 @@ Requires(postun): /sbin/service
 %description server
 Configuration management server
 
+%package doc
+Summary:          Documentation for Bcfg2
+Group:            System
+
+BuildRequires:    python-sphinx
+BuildRequires:    python-docutils
+
+%description doc
+Documentation for Bcfg2.
+
 %prep
-%setup0 -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
-%patch0 -p1
+#%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
+%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
+%patch0 -p1 -b .bcfg2-py27-auth
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -103,6 +119,14 @@ done
 
 %build
 %{__python} -c 'import setuptools; execfile("setup.py")' build
+#%{__python} -c 'import setuptools; execfile("setup.py")' build_dtddoc
+%{__python} -c 'import setuptools; execfile("setup.py")' build_sphinx
+
+
+#%{?pythonpath: export PYTHONPATH="%{pythonpath}"}
+#%{__python}%{pythonversion} setup.py build_dtddoc
+#%{__python}%{pythonversion} setup.py build_sphinx
+
 
 %install
 rm -rf %{buildroot}
@@ -116,6 +140,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
 mkdir -p %{buildroot}%{_libexecdir}
 mkdir -p %{buildroot}%{_var}/lib/bcfg2
 mkdir -p %{buildroot}%{_var}/cache/bcfg2
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
@@ -131,6 +156,9 @@ install -m 644 debian/bcfg2-server.default %{buildroot}%{_sysconfdir}/sysconfig/
 touch %{buildroot}%{_sysconfdir}/bcfg2.cert
 touch %{buildroot}%{_sysconfdir}/bcfg2.conf
 touch %{buildroot}%{_sysconfdir}/bcfg2.key
+
+mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
+#mv build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}/
 
 %clean
 rm -rf %{buildroot}
@@ -225,7 +253,15 @@ fi
 
 %dir %{_var}/lib/bcfg2
 
+%files doc
+%defattr(-,root,root,-)
+%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
+
 %changelog
+* Sun Mar 20 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-1.1.pre1
+- Added doc subpackage
+- Updated to new upstream version 1.2.0pre1
+
 * Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-2
 - Added new man page
 - Updated doc section (ChangeLog is gone)
