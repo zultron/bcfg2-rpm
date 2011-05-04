@@ -192,16 +192,17 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc AUTHORS examples COPYRIGHT README
-
+%{_mandir}/man1/bcfg2.1*
+%{_mandir}/man5/bcfg2*.5*
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.cert
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.conf
-
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2
 %{_sysconfdir}/cron.daily/bcfg2
 %{_sysconfdir}/cron.hourly/bcfg2
-
 %{_initrddir}/bcfg2
-
+%{_sbindir}/bcfg2
+%{_libexecdir}/bcfg2-cron
+%dir %{_var}/cache/bcfg2
 %{python_sitelib}/Bcfg2*.egg-info
 %dir %{python_sitelib}/Bcfg2
 %{python_sitelib}/Bcfg2/__init__.*
@@ -213,43 +214,17 @@ fi
 %{python_sitelib}/Bcfg2/SSLServer.*
 %{python_sitelib}/Bcfg2/Statistics.*
 
-%{_sbindir}/bcfg2
-%{_mandir}/man1/bcfg2.1*
-%{_mandir}/man5/bcfg2.conf.5*
-
-%{_libexecdir}/bcfg2-cron
-
-%dir %{_var}/cache/bcfg2
 
 %files server
 %defattr(-,root,root,-)
-
+%{_mandir}/man8/bcfg2*.8*
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.key
-
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2-server
-
 %{_initrddir}/bcfg2-server
-
-%{python_sitelib}/Bcfg2/Server
-
 %{_datadir}/bcfg2
-
-%{_sbindir}/bcfg2-admin
-%{_sbindir}/bcfg2-build-reports
-%{_sbindir}/bcfg2-info
-%{_sbindir}/bcfg2-ping-sweep
-%{_sbindir}/bcfg2-repo-validate
-%{_sbindir}/bcfg2-reports
-%{_sbindir}/bcfg2-server
-
-%{_mandir}/man8/bcfg2-admin.8*
-%{_mandir}/man8/bcfg2-build-reports.8*
-%{_mandir}/man8/bcfg2-info.8*
-%{_mandir}/man8/bcfg2-repo-validate.8*
-%{_mandir}/man8/bcfg2-reports.8*
-%{_mandir}/man8/bcfg2-server.8*
-
+%{_sbindir}/bcfg2-*
 %dir %{_var}/lib/bcfg2
+%{python_sitelib}/Bcfg2/Server
 
 %files doc
 %defattr(-,root,root,-)
@@ -257,6 +232,8 @@ fi
 
 %changelog
 * Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-2.1.pre2
+- Added bcfg2-lint stuff
+- Pooled file section entries to reduce future maintainance
 - Removed Patch
 
 * Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-1.1.pre2
