@@ -4,7 +4,7 @@
 %{!?py_ver: %define py_ver %(%{__python} -c 'import sys;print(sys.version[0:3])')}
 %global pythonversion %{py_ver}
 #%global _rc 1
-%global _pre 1
+%global _pre 2
 
 Name:             bcfg2
 Version:          1.2.0
@@ -258,6 +258,9 @@ fi
 %doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 
 %changelog
+* Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-1.1.pre2
+- Updated to new upstream version 1.2.0pre2
+
 * Sun Mar 20 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-1.1.pre1
 - Added doc subpackage
 - Updated to new upstream version 1.2.0pre1
