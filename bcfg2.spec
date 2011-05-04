@@ -9,7 +9,7 @@
 Name:             bcfg2
 Version:          1.2.0
 #Release:          1%{?_rc:.rc%{_rc}}%{?dist}
-Release:          1%{?_pre:.pre%{_pre}}%{?dist}
+Release:          2%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -19,7 +19,6 @@ URL:              http://trac.mcs.anl.gov/projects/bcfg2
 #Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
 Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
-Patch0:           bcfg2-py27-auth.patch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
 
@@ -97,7 +96,6 @@ Documentation for Bcfg2.
 %prep
 #%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
 %setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
-%patch0 -p1 -b .bcfg2-py27-auth
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -258,6 +256,9 @@ fi
 %doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 
 %changelog
+* Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-2.1.pre2
+- Removed Patch
+
 * Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-1.1.pre2
 - Updated to new upstream version 1.2.0pre2
 
