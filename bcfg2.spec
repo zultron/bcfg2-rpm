@@ -4,12 +4,12 @@
 %{!?py_ver: %define py_ver %(%{__python} -c 'import sys;print(sys.version[0:3])')}
 %global pythonversion %{py_ver}
 #%global _rc 1
-%global _pre 2
+%global _pre 3
 
 Name:             bcfg2
 Version:          1.2.0
 #Release:          1%{?_rc:.rc%{_rc}}%{?dist}
-Release:          2%{?_pre:.pre%{_pre}}%{?dist}
+Release:          3%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          Configuration management system
 
 Group:            Applications/System
@@ -231,6 +231,9 @@ fi
 %doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 
 %changelog
+* Wed Jun 22 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-3.1.pre3
+- Updated to new upstream version 1.2.0pre3
+
 * Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-2.1.pre2
 - Added bcfg2-lint stuff
 - Pooled file section entries to reduce future maintainance
