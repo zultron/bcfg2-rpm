@@ -213,7 +213,7 @@ fi
 %{python_sitelib}/Bcfg2/Proxy.*
 %{python_sitelib}/Bcfg2/SSLServer.*
 %{python_sitelib}/Bcfg2/Statistics.*
-
+%{python_sitelib}/Bcfg2/Bcfg2Py3k.py
 
 %files server
 %defattr(-,root,root,-)
@@ -232,7 +232,7 @@ fi
 
 %changelog
 * Wed Jun 22 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-3.1.pre3
-- Updated to new upstream version 1.2.0pre3
+- Updated to new upstreadm version 1.2.0pre3
 
 * Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-2.1.pre2
 - Added bcfg2-lint stuff
