@@ -213,7 +213,7 @@ fi
 %{python_sitelib}/Bcfg2/Proxy.*
 %{python_sitelib}/Bcfg2/SSLServer.*
 %{python_sitelib}/Bcfg2/Statistics.*
-%{python_sitelib}/Bcfg2/Bcfg2Py3k.py
+%{python_sitelib}/Bcfg2/Bcfg2Py3k.*
 
 %files server
 %defattr(-,root,root,-)
