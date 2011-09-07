@@ -3,22 +3,22 @@
 %endif
 %{!?py_ver: %define py_ver %(%{__python} -c 'import sys;print(sys.version[0:3])')}
 %global pythonversion %{py_ver}
-#%global _rc 1
-%global _pre 3
+%global _rc 1
+#%global _pre 3
 
 Name:             bcfg2
 Version:          1.2.0
-#Release:          1%{?_rc:.rc%{_rc}}%{?dist}
-Release:          3%{?_pre:.pre%{_pre}}%{?dist}
-Summary:          Configuration management system
+Release:          4%{?_rc:.rc%{_rc}}%{?dist}
+#Release:          3%{?_pre:.pre%{_pre}}%{?dist}
+Summary:          A configuration management system
 
 Group:            Applications/System
 License:          BSD
-URL:              http://trac.mcs.anl.gov/projects/bcfg2
-#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
-#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
-Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
+URL:              http://bcfg2.org
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
+Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
+#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
+#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
 
@@ -231,6 +231,9 @@ fi
 %doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 
 %changelog
+* Wed Sep 07 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-4.1.rc1
+- Updated to new upstreadm version 1.2.0rc1
+
 * Wed Jun 22 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-3.1.pre3
 - Updated to new upstreadm version 1.2.0pre3
 
