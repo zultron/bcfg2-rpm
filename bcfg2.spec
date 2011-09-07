@@ -94,8 +94,8 @@ BuildRequires:    python-docutils
 Documentation for Bcfg2.
 
 %prep
-#%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
-%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
+%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
+#%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
 
 # fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
