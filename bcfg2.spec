@@ -3,12 +3,12 @@
 %endif
 %{!?py_ver: %define py_ver %(%{__python} -c 'import sys;print(sys.version[0:3])')}
 %global pythonversion %{py_ver}
-%global _rc 1
+#%global _rc 1
 #%global _pre 3
 
 Name:             bcfg2
 Version:          1.2.0
-Release:          4%{?_rc:.rc%{_rc}}%{?dist}
+Release:          5%{?_rc:.rc%{_rc}}%{?dist}
 #Release:          3%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
 
@@ -97,7 +97,7 @@ Documentation for Bcfg2.
 %setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
 #%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
 
-# fixup some paths
+# Fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2-server.init
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' tools/bcfg2-cron
@@ -105,11 +105,11 @@ Documentation for Bcfg2.
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.daily
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.hourly
 
-# don't start servers by default
+# Don't start servers by default
 %{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/bcfg2.init
 %{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/bcfg2-server.init
 
-# get rid of extraneous shebangs
+# Get rid of extraneous shebangs
 for f in `find src/lib -name \*.py`
 do
         %{__sed} -i -e '/^#!/,1d' $f
@@ -231,32 +231,35 @@ fi
 %doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 
 %changelog
-* Wed Sep 07 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-4.1.rc1
+* Wed Sep 07 2011 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.0-5
+- Updated to new upstreadm version 1.2.0
+
+* Wed Sep 07 2011 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.0-4.1.rc1
 - Updated to new upstreadm version 1.2.0rc1
 
-* Wed Jun 22 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-3.1.pre3
+* Wed Jun 22 2011 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.0-3.1.pre3
 - Updated to new upstreadm version 1.2.0pre3
 
-* Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-2.1.pre2
+* Wed May 04 2011 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.0-2.1.pre2
 - Added bcfg2-lint stuff
 - Pooled file section entries to reduce future maintainance
 - Removed Patch
 
-* Wed May 04 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-1.1.pre2
+* Wed May 04 2011 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.0-1.1.pre2
 - Updated to new upstream version 1.2.0pre2
 
-* Sun Mar 20 2011 Fabian Affolter <fabian@bernewireless.net> - 1.2.0-1.1.pre1
+* Sun Mar 20 2011 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.0-1.1.pre1
 - Added doc subpackage
 - Updated to new upstream version 1.2.0pre1
 
 * Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-2.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
-* Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-2
+* Thu Nov 18 2010 Fabian Affolter <mail@fabian-affolter.ch> - 1.1.1-2
 - Added new man page
 - Updated doc section (ChangeLog is gone)
 
-* Thu Nov 18 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.1-1
+* Thu Nov 18 2010 Fabian Affolter <mail@fabian-affolter.ch> - 1.1.1-1
 - Updated to new upstream version 1.1.1
 
 * Fri Nov  5 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.1.0-3
@@ -370,16 +373,16 @@ fi
 * Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 1.1.0-1.1.rc4.1
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 
-* Tue Jul 20 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-1.1.rc4
+* Tue Jul 20 2010 Fabian Affolter <mail@fabian-affolter.ch> - 1.1.0-1.1.rc4
 - Added patch to fix indention
 
-* Tue Jul 20 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.1.rc4
+* Tue Jul 20 2010 Fabian Affolter <mail@fabian-affolter.ch> - 1.1.0-0.1.rc4
 - Updated to new upstream release candidate RC4
 
-* Sat Jun 19 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.1.rc3
+* Sat Jun 19 2010 Fabian Affolter <mail@fabian-affolter.ch> - 1.1.0-0.1.rc3
 - Updated to new upstream release candidate RC3 
 
-* Sun May 02 2010 Fabian Affolter <fabian@bernewireless.net> - 1.1.0-0.2.rc1
+* Sun May 02 2010 Fabian Affolter <mail@fabian-affolter.ch> - 1.1.0-0.2.rc1
 - Changed define to global
 - Added graphviz for the server package
 
