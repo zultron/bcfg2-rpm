@@ -8,7 +8,7 @@
 
 Name:             bcfg2
 Version:          1.2.0
-Release:          5%{?_rc:.rc%{_rc}}%{?dist}
+Release:          5%{?_rc:.rc%{_rc}}%{?dist}.1
 #Release:          3%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
 
@@ -231,6 +231,9 @@ fi
 %doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 
 %changelog
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.0-5.rc1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Wed Sep 07 2011 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.0-5
 - Updated to new upstreadm version 1.2.0
 
