@@ -153,7 +153,7 @@ sed -i -e 's|ExecStart=/usr/bin/bcfg2-server|ExecStart=/usr/sbin/bcfg2-server|g'
 
 %build
 %{__python} setup.py build
-%{__python} setup.py build_dtddoc
+#%{__python} setup.py build_dtddoc
 %{__python} setup.py build_sphinx
 
 #%{?pythonpath: export PYTHONPATH="%{pythonpath}"}
