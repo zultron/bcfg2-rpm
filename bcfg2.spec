@@ -8,7 +8,7 @@
 
 Name:             bcfg2
 Version:          1.2.1
-Release:          1%{?dist}
+Release:          2%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
 #Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
@@ -151,17 +151,14 @@ done
 sed -i -e 's|ExecStart=/usr/bin/bcfg2|ExecStart=/usr/sbin/bcfg2|g' redhat/systemd/%{name}.service
 sed -i -e 's|ExecStart=/usr/bin/bcfg2-server|ExecStart=/usr/sbin/bcfg2-server|g' redhat/systemd/%{name}-server.service
 
-cat redhat/systemd/%{name}.service
-cat redhat/systemd/%{name}-server.service
-
 %build
 %{__python} setup.py build
 %{__python} setup.py build_dtddoc
-#%{__python} setup.py build_sphinx
+%{__python} setup.py build_sphinx
 
 %{?pythonpath: export PYTHONPATH="%{pythonpath}"}
 #%{__python}%{pythonversion} setup.py build_dtddoc
-%{__python}%{pythonversion} setup.py build_sphinx
+#%{__python}%{pythonversion} setup.py build_sphinx
 
 %install
 rm -rf %{buildroot}
@@ -358,6 +355,9 @@ fi
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Sun Feb 26 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.1-2
+- Fixed systemd files
+
 * Tue Feb 07 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.1-1
 - Added examples package
 - Updated to new upstream version 1.2.1
