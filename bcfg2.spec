@@ -7,8 +7,8 @@
 #%global _pre 3
 
 Name:             bcfg2
-Version:          1.2.1
-Release:          2%{?dist}
+Version:          1.2.2
+Release:          1%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
 #Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
@@ -355,6 +355,9 @@ fi
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Fri Apr 06 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.2-1
+- Updated to new upstream version 1.2.2
+
 * Sun Feb 26 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.1-2
 - Fixed systemd files
 
