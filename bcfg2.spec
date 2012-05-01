@@ -8,7 +8,7 @@
 
 Name:             bcfg2
 Version:          1.2.2
-Release:          1%{?dist}
+Release:          2%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
 #Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
@@ -29,6 +29,7 @@ BuildRequires:    python2-devel
 BuildRequires:    python-setuptools
 
 Requires:         python-lxml
+Requires:         python-nose
 %if 0%{?epel} > 0
 Requires:	      python-ssl
 %endif
@@ -355,6 +356,9 @@ fi
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Tue May 01 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.2-2
+- python-nose is needed by bcfg2-test
+
 * Fri Apr 06 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.2-1
 - Updated to new upstream version 1.2.2
 
