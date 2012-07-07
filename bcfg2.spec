@@ -7,8 +7,8 @@
 #%global _pre 3
 
 Name:             bcfg2
-Version:          1.2.2
-Release:          2%{?dist}
+Version:          1.2.3
+Release:          1%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
 #Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
@@ -147,10 +147,6 @@ for f in `find src/lib -name \*.py`
 do
     %{__sed} -i -e '/^#!/,1d' $f
 done
-
-# Wrong path in .service file fixed
-sed -i -e 's|ExecStart=/usr/bin/bcfg2|ExecStart=/usr/sbin/bcfg2|g' redhat/systemd/%{name}.service
-sed -i -e 's|ExecStart=/usr/bin/bcfg2-server|ExecStart=/usr/sbin/bcfg2-server|g' redhat/systemd/%{name}-server.service
 
 %build
 %{__python} setup.py build
@@ -356,6 +352,10 @@ fi
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Sat Jul 07 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.3-1
+- Fix CVE-2012-3366
+- Updated to new upstream version 1.2.3
+
 * Tue May 01 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.2-2
 - python-nose is needed by bcfg2-test
 
