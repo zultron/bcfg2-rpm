@@ -8,7 +8,7 @@
 
 Name:             bcfg2
 Version:          1.2.3
-Release:          1%{?dist}
+Release:          2%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
 #Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
@@ -352,6 +352,9 @@ fi
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Sat Jul 07 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.2.3-1
 - Fix CVE-2012-3366
 - Updated to new upstream version 1.2.3
