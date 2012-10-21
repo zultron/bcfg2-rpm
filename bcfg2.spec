@@ -8,7 +8,7 @@
 
 Name:             bcfg2
 Version:          1.2.3
-Release:          2%{?dist}
+Release:          3%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
 #Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
@@ -209,74 +209,98 @@ mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}/
 rm -rf %{buildroot}
 
 %post
-if [ $1 -eq 1 ] ; then
-    # Initial installation
-%if 0%{?fedora} >= 16
-    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%if 0%{?fedora} >= 18
+  %systemd_post bcfg2.service
 %else
-    /sbin/chkconfig --add bcfg2
+  if [ $1 -eq 1 ] ; then
+      # Initial installation
+  %if 0%{?fedora} >= 16
+      /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %else
+      /sbin/chkconfig --add bcfg2
+  %endif
+  fi
 %endif
-fi
 
 %post server
-if [ $1 -eq 1 ] ; then
-    # Initial installation
-%if 0%{?fedora} >= 16
-    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%if 0%{?fedora} >= 18
+  %systemd_post bcfg2-server.service
 %else
-    /sbin/chkconfig --add bcfg2-server
+  if [ $1 -eq 1 ] ; then
+      # Initial installation
+  %if 0%{?fedora} >= 16
+      /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %else
+      /sbin/chkconfig --add bcfg2-server
+  %endif
+  fi
 %endif
-fi
 
 %preun
-if [ $1 -eq 0 ]; then
-    # Package removal, not upgrade
-%if 0%{?fedora} >= 16
-    /bin/systemctl --no-reload disable bcfg2.service > /dev/null 2>&1 || :
-    /bin/systemctl stop bcfg2.service > /dev/null 2>&1 || :
+%if 0%{?fedora} >= 18
+  %systemd_preun bcfg2.service
 %else
-    /sbin/service bcfg2 stop &>/dev/null || :
-    /sbin/chkconfig --del bcfg2
+  if [ $1 -eq 0 ]; then
+      # Package removal, not upgrade
+  %if 0%{?fedora} >= 16
+      /bin/systemctl --no-reload disable bcfg2.service > /dev/null 2>&1 || :
+      /bin/systemctl stop bcfg2.service > /dev/null 2>&1 || :
+  %else
+      /sbin/service bcfg2 stop &>/dev/null || :
+      /sbin/chkconfig --del bcfg2
+  %endif
+  fi
 %endif
-fi
 
 %preun server
-if [ $1 -eq 0 ]; then
-    # Package removal, not upgrade
-%if 0%{?fedora} >= 16
-    /bin/systemctl --no-reload disable bcfg2-server.service > /dev/null 2>&1 || :
-    /bin/systemctl stop bcfg2-server.service > /dev/null 2>&1 || :
+%if 0%{?fedora} >= 18
+  %systemd_preun bcfg2-server.service
 %else
-    /sbin/service bcfg2-server stop &>/dev/null || :
-    /sbin/chkconfig --del bcfg2-server
+  if [ $1 -eq 0 ]; then
+      # Package removal, not upgrade
+  %if 0%{?fedora} >= 16
+      /bin/systemctl --no-reload disable bcfg2-server.service > /dev/null 2>&1 || :
+      /bin/systemctl stop bcfg2-server.service > /dev/null 2>&1 || :
+  %else
+      /sbin/service bcfg2-server stop &>/dev/null || :
+      /sbin/chkconfig --del bcfg2-server
+  %endif
+  fi
 %endif
-fi
 
 %postun
-%if 0%{?fedora} >= 16
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-%endif
-if [ $1 -ge 1 ] ; then
-    # Package upgrade, not uninstall
-%if 0%{?fedora} >= 16
-    /bin/systemctl try-restart bcfg2.service >/dev/null 2>&1 || :
+%if 0%{?fedora} >= 18
+  %systemd_postun bcfg2.service
 %else
-    /sbin/service bcfg2 condrestart &>/dev/null || :
+  %if 0%{?fedora} >= 16
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %endif
+  if [ $1 -ge 1 ] ; then
+      # Package upgrade, not uninstall
+  %if 0%{?fedora} >= 16
+      /bin/systemctl try-restart bcfg2.service >/dev/null 2>&1 || :
+  %else
+      /sbin/service bcfg2 condrestart &>/dev/null || :
+  %endif
+  fi
 %endif
-fi
 
 %postun server
-%if 0%{?fedora} >= 16
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-%endif
-if [ $1 -ge 1 ] ; then
-    # Package upgrade, not uninstall
-%if 0%{?fedora} >= 16
-    /bin/systemctl try-restart bcfg2-server.service >/dev/null 2>&1 || :
+%if 0%{?fedora} >= 18
+  %systemd_postun bcfg2-server.service
 %else
-    /sbin/service bcfg2-server condrestart &>/dev/null || :
+  %if 0%{?fedora} >= 16
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %endif
+  if [ $1 -ge 1 ] ; then
+      # Package upgrade, not uninstall
+  %if 0%{?fedora} >= 16
+      /bin/systemctl try-restart bcfg2-server.service >/dev/null 2>&1 || :
+  %else
+      /sbin/service bcfg2-server condrestart &>/dev/null || :
+  %endif
+  fi
 %endif
-fi
 
 %triggerun -- bcfg2 < 1.2.1-1
 /usr/bin/systemd-sysv-convert --save bcfg2 >/dev/null 2>&1 || :
@@ -352,6 +376,9 @@ fi
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Mon Aug 27 2012 Václav Pavlín <vpavlin@redhat.com> - 1.2.3-3
+- Scriptlets replaced with new systemd macros (#850043)
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
