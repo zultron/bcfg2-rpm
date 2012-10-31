@@ -4,24 +4,24 @@
 %{!?py_ver: %define py_ver %(%{__python} -c 'import sys;print(sys.version[0:3])')}
 %global pythonversion %{py_ver}
 #%global _rc 1
-#%global _pre 3
+%global _pre 2
 
 Name:             bcfg2
-Version:          1.2.3
-Release:          3%{?dist}
+Version:          1.3.0
+#Release:          1%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
-#Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
+Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://bcfg2.org
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
-Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz.gpg
+#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
+#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz.gpg
 #Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 #Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
-#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
-#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
+Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
 
@@ -126,9 +126,9 @@ Group:            System
 Examples files for Bcfg2.
 
 %prep
-%setup -q
+#%setup -q
 #%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
-#%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
+%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
 
 # Fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -182,8 +182,6 @@ install -m 644 debian/bcfg2.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2
 install -m 644 debian/bcfg2-server.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2-server
 
 touch %{buildroot}%{_sysconfdir}/%{name}.{cert,conf,key}
-#touch %{buildroot}%{_sysconfdir}/bcfg2.conf
-#touch %{buildroot}%{_sysconfdir}/bcfg2.key
 
 # systemd
 mkdir -p %{buildroot}%{_unitdir}
@@ -195,10 +193,10 @@ install -d %{buildroot}%{apache_conf}/conf.d
 install -p -m 644 misc/apache/bcfg2.conf %{buildroot}%{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 # Documentation
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
-mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
-#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
-#mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
+#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
+#mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
+mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 #mv build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}/
 
 # Examples
@@ -365,17 +363,20 @@ rm -rf %{buildroot}
 
 %files doc
 %defattr(-,root,root,-)
-%doc %{_defaultdocdir}/bcfg2-doc-%{version}
-#%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
+#%doc %{_defaultdocdir}/bcfg2-doc-%{version}
+%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 #%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_rc:rc%{_rc}}
 
 %files examples
 %defattr(-,root,root,-)
-%doc %{_defaultdocdir}/bcfg2-examples-%{version}
-#%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
+#%doc %{_defaultdocdir}/bcfg2-examples-%{version}
+%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Wed Oct 31 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.3.0-0.1.pre2
+- Updated to new upstream version 1.3.0 pre2
+
 * Mon Aug 27 2012 Václav Pavlín <vpavlin@redhat.com> - 1.2.3-3
 - Scriptlets replaced with new systemd macros (#850043)
 
