@@ -358,6 +358,8 @@ rm -rf %{buildroot}
 %{_sbindir}/bcfg2-*
 %dir %{_var}/lib/bcfg2
 %{python_sitelib}/Bcfg2/Server
+%{python_sitelib}/Bcfg2/Compat.*
+%{python_sitelib}/Bcfg2/version.*
 
 %files web
 %defattr(-,root,root,-)
