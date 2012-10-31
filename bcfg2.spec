@@ -335,11 +335,15 @@ rm -rf %{buildroot}
 %dir %{python_sitelib}/Bcfg2
 %{python_sitelib}/Bcfg2/__init__.*
 %{python_sitelib}/Bcfg2/Client
+%{python_sitelib}/Bcfg2/Cache.*
+%{python_sitelib}/Bcfg2/Compat.*
+%{python_sitelib}/Bcfg2/Encryption.*
 %{python_sitelib}/Bcfg2/Logger.*
 %{python_sitelib}/Bcfg2/Options.*
 %{python_sitelib}/Bcfg2/Proxy.*
 %{python_sitelib}/Bcfg2/SSLServer.*
 %{python_sitelib}/Bcfg2/Statistics.*
+%{python_sitelib}/Bcfg2/version.*
 
 %files server
 %defattr(-,root,root,-)
@@ -359,6 +363,9 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_datadir}/bcfg2/reports.wsgi
 %{_datadir}/bcfg2/site_media
+%{python_sitelib}/Bcfg2/Reporting
+%{python_sitelib}/Bcfg2/manage.*
+%{python_sitelib}/Bcfg2/settings.*
 %config(noreplace) %{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 %files doc
