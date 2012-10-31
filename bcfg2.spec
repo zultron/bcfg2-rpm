@@ -200,8 +200,10 @@ mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre
 #mv build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}/
 
 # Examples
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}
-mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}/
+#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}
+#mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}/
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
+mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}/
 
 %clean
 rm -rf %{buildroot}
