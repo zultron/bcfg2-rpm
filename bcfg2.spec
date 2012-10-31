@@ -333,13 +333,11 @@ rm -rf %{buildroot}
 %dir %{python_sitelib}/Bcfg2
 %{python_sitelib}/Bcfg2/__init__.*
 %{python_sitelib}/Bcfg2/Client
-%{python_sitelib}/Bcfg2/Component.*
 %{python_sitelib}/Bcfg2/Logger.*
 %{python_sitelib}/Bcfg2/Options.*
 %{python_sitelib}/Bcfg2/Proxy.*
 %{python_sitelib}/Bcfg2/SSLServer.*
 %{python_sitelib}/Bcfg2/Statistics.*
-%{python_sitelib}/Bcfg2/Bcfg2Py3k.*
 
 %files server
 %defattr(-,root,root,-)
