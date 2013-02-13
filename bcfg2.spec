@@ -10,7 +10,7 @@ Name:             bcfg2
 Version:          1.3.0
 #Release:          1%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
-Release:          0.1%{?_pre:.pre%{_pre}}%{?dist}
+Release:          0.2%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
 
 Group:            Applications/System
@@ -383,6 +383,9 @@ rm -rf %{buildroot}
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0-0.2.pre2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
 * Wed Oct 31 2012 Fabian Affolter <mail@fabian-affolter.ch> - 1.3.0-0.1.pre2
 - Updated to new upstream version 1.3.0 pre2
 
