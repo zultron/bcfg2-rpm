@@ -316,7 +316,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS COPYRIGHT README
+%doc COPYRIGHTLICENSE README
 %{_mandir}/man1/bcfg2.1*
 %{_mandir}/man5/bcfg2*.5*
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.cert
