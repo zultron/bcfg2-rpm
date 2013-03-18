@@ -4,24 +4,24 @@
 %{!?py_ver: %define py_ver %(%{__python} -c 'import sys;print(sys.version[0:3])')}
 %global pythonversion %{py_ver}
 #%global _rc 1
-%global _pre 2
+#%global _pre 2
 
 Name:             bcfg2
 Version:          1.3.0
-#Release:          1%{?dist}
+Release:          1%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
-Release:          0.2%{?_pre:.pre%{_pre}}%{?dist}
+#Release:          0.2%{?_pre:.pre%{_pre}}%{?dist}
 Summary:          A configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://bcfg2.org
-#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
-#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz.gpg
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
+Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz.gpg
 #Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
 #Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
-Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
+#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
+#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:        noarch
 
@@ -126,9 +126,9 @@ Group:            System
 Examples files for Bcfg2.
 
 %prep
-#%setup -q
+%setup -q
 #%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
-%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
+#%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
 
 # Fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -193,17 +193,17 @@ install -d %{buildroot}%{apache_conf}/conf.d
 install -p -m 644 misc/apache/bcfg2.conf %{buildroot}%{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 # Documentation
-#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
-#mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
-mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
+mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
+#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
+#mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 #mv build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}/
 
 # Examples
-#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}
-#mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}/
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
-mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}/
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}
+mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}/
+#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
+#mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}/
 
 %clean
 rm -rf %{buildroot}
@@ -372,17 +372,20 @@ rm -rf %{buildroot}
 
 %files doc
 %defattr(-,root,root,-)
-#%doc %{_defaultdocdir}/bcfg2-doc-%{version}
-%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
+%doc %{_defaultdocdir}/bcfg2-doc-%{version}
+#%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
 #%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_rc:rc%{_rc}}
 
 %files examples
 %defattr(-,root,root,-)
-#%doc %{_defaultdocdir}/bcfg2-examples-%{version}
-%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
+%doc %{_defaultdocdir}/bcfg2-examples-%{version}
+#%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Mon Mar 18 2013 Fabian Affolter <mail@fabian-affolter.ch> - 1.3.0-1
+- Updated to new upstream version 1.3.0
+
 * Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0-0.2.pre2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
