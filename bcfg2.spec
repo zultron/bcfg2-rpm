@@ -70,10 +70,11 @@ Requires:         bcfg2 = %{version}-%{release}
 Requires:         /usr/sbin/sendmail
 Requires:         /usr/bin/openssl
 Requires:         gamin-python
-Requires:         redhat-lsb
 Requires:         python-genshi
 Requires:         python-cheetah
 Requires:         graphviz
+Requires:         python-daemon
+Requires:         python-lxml
 %if 0%{?fedora} >= 16
 BuildRequires:    systemd-units
 Requires(post):   systemd-units
@@ -114,6 +115,7 @@ Group:            System
 
 BuildRequires:    python-sphinx
 BuildRequires:    python-docutils
+BuildRequires:    python-lxml
 
 %description doc
 Documentation for Bcfg2.
