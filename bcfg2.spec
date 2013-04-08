@@ -7,7 +7,7 @@
 #%global _pre 2
 
 Name:             bcfg2
-Version:          1.3.0
+Version:          1.3.1
 Release:          1%{?dist}
 #Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
 #Release:          0.2%{?_pre:.pre%{_pre}}%{?dist}
@@ -385,6 +385,9 @@ rm -rf %{buildroot}
 #%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
 
 %changelog
+* Mon Apr 08 2013 Fabian Affolter <mail@fabian-affolter.ch> - 1.3.1-1
+- Updated to new upstream version 1.3.1
+
 * Mon Mar 18 2013 Fabian Affolter <mail@fabian-affolter.ch> - 1.3.0-1
 - Updated to new upstream version 1.3.0
 
