@@ -1,28 +1,29 @@
-%if (0%{?fedora} > 12 || 0%{?rhel} > 5)
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+# Fedora 13+ and EL6 contain these macros already; only needed for EL5
+%if 0%{?rhel} == 5
+%global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
+%define python_version %(%{__python} -c 'import sys;print(sys.version[0:3])')
 %endif
-%{!?py_ver: %define py_ver %(%{__python} -c 'import sys;print(sys.version[0:3])')}
-%global pythonversion %{py_ver}
-#%global _rc 1
-#%global _pre 2
+
+# Remove the initial <hash><percent> characters for pre/rc packaging
+#%%global _rc 1
+#%%global _pre 2
+%global _pre_rc %{?_pre:pre%{_pre}}%{?_rc:rc%{_rc}}
 
 Name:             bcfg2
-Version:          1.3.1
+Version:          1.3.2
 Release:          1%{?dist}
-#Release:          0.1%{?_rc:.rc%{_rc}}%{?dist}
-#Release:          0.2%{?_pre:.pre%{_pre}}%{?dist}
+#Release:          0.1%{?_pre_rc}
 Summary:          A configuration management system
 
 Group:            Applications/System
 License:          BSD
 URL:              http://bcfg2.org
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz
-Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}.tar.gz.gpg
-#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz
-#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_rc:rc%{_rc}}.tar.gz.gpg
-#Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz
-#Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre:pre%{_pre}}.tar.gz.gpg
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar.gz
+Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar.gz.gpg
+%if 0%{?rhel} == 5
+# EL5 requires the BuildRoot tag
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%endif
 BuildArch:        noarch
 
 BuildRequires:    python2-devel
@@ -31,7 +32,7 @@ BuildRequires:    python-setuptools
 Requires:         python-lxml
 Requires:         python-nose
 %if 0%{?epel} > 0
-Requires:	      python-ssl
+Requires:         python-ssl
 %endif
 
 %if 0%{?fedora} >= 16
@@ -45,6 +46,7 @@ Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
 %endif
+
 
 %description
 Bcfg2 helps system administrators produce a consistent, reproducible,
@@ -63,18 +65,23 @@ administrator has done in specifying the configuration of client
 systems. Bcfg2 is therefore built to help administrators construct an
 accurate, comprehensive specification.
 
+
 %package server
 Summary:          Configuration management server
 Group:            System Environment/Daemons
 Requires:         bcfg2 = %{version}-%{release}
 Requires:         /usr/sbin/sendmail
 Requires:         /usr/bin/openssl
-Requires:         gamin-python
+Requires:         python-inotify
 Requires:         python-genshi
 Requires:         python-cheetah
 Requires:         graphviz
 Requires:         python-daemon
 Requires:         python-lxml
+%if "%{python_version}" < "2.6"
+# EL5
+Requires:         python-ssl
+%endif
 %if 0%{?fedora} >= 16
 BuildRequires:    systemd-units
 Requires(post):   systemd-units
@@ -88,8 +95,10 @@ Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
 %endif
 
+
 %description server
 Configuration management server
+
 
 %package web
 Summary:          Bcfg2 Web Reporting Interface
@@ -106,31 +115,42 @@ Requires: apache2-mod_wsgi
 %define apache_conf %{_sysconfdir}/apache2
 %endif
 
+
 %description web
 The Bcfg2 Web Reporting Interface.
+
 
 %package doc
 Summary:          Documentation for Bcfg2
 Group:            System
 
-BuildRequires:    python-sphinx
+%if 0%{?rhel}
+# EL5/6 sphinx 0.6 is too old; use sphinx 1.0 from EPEL
+BuildRequires: python-sphinx10
+# python-sphinx10 doesn't set sys.path correctly; do it for them
+%define pythonpath %(find %{python_sitelib} -name Sphinx*.egg)
+%else
+BuildRequires: python-sphinx >= 1.0
+%endif
 BuildRequires:    python-docutils
 BuildRequires:    python-lxml
 
+
 %description doc
 Documentation for Bcfg2.
+
 
 %package examples
 Summary:          Examples for Bcfg2
 Group:            System
 
+
 %description examples
 Examples files for Bcfg2.
 
+
 %prep
-%setup -q
-#%setup -q -n %{name}-%{version}%{?_rc:rc%{_rc}}
-#%setup -q -n %{name}-%{version}%{?_pre:pre%{_pre}}
+%setup -q -n %{name}-%{version}%{?_pre_rc}
 
 # Fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
@@ -150,17 +170,23 @@ do
     %{__sed} -i -e '/^#!/,1d' $f
 done
 
+
 %build
 %{__python} setup.py build
 #%{__python} setup.py build_dtddoc
-%{__python} setup.py build_sphinx
+%{?pythonpath: PYTHONPATH="%{pythonpath}"} \
+    %{__python} setup.py build_sphinx
 
 #%{?pythonpath: export PYTHONPATH="%{pythonpath}"}
-#%{__python}%{pythonversion} setup.py build_dtddoc
-#%{__python}%{pythonversion} setup.py build_sphinx
+#%{__python}%{python_version} setup.py build_dtddoc
+
 
 %install
+%if 0%{?rhel} == 5
+# EL5 requires the buildroot to be cleaned manually
 rm -rf %{buildroot}
+%endif
+
 %{__python} setup.py install -O1 --skip-build --root=%{buildroot}
 
 mkdir -p %{buildroot}%{_sbindir}
@@ -174,14 +200,21 @@ mkdir -p %{buildroot}%{_var}/cache/bcfg2
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
-install -m 755 debian/bcfg2.init %{buildroot}%{_initrddir}/bcfg2
-install -m 755 debian/bcfg2-server.init %{buildroot}%{_initrddir}/bcfg2-server
-install -m 755 debian/bcfg2.cron.daily %{buildroot}%{_sysconfdir}/cron.daily/bcfg2
-install -m 755 debian/bcfg2.cron.hourly %{buildroot}%{_sysconfdir}/cron.hourly/bcfg2
-install -m 755 tools/bcfg2-cron %{buildroot}%{_libexecdir}/bcfg2-cron
+install -m 755 redhat/scripts/bcfg2.init \
+    %{buildroot}%{_initrddir}/bcfg2
+install -m 755 redhat/scripts/bcfg2-server.init \
+    %{buildroot}%{_initrddir}/bcfg2-server
+install -m 755 debian/bcfg2.cron.daily \
+    %{buildroot}%{_sysconfdir}/cron.daily/bcfg2
+install -m 755 debian/bcfg2.cron.hourly \
+    %{buildroot}%{_sysconfdir}/cron.hourly/bcfg2
+install -m 755 tools/bcfg2-cron \
+    %{buildroot}%{_libexecdir}/bcfg2-cron
 
-install -m 644 debian/bcfg2.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2
-install -m 644 debian/bcfg2-server.default %{buildroot}%{_sysconfdir}/sysconfig/bcfg2-server
+install -m 644 debian/bcfg2.default \
+    %{buildroot}%{_sysconfdir}/sysconfig/bcfg2
+install -m 644 debian/bcfg2-server.default \
+    %{buildroot}%{_sysconfdir}/sysconfig/bcfg2-server
 
 touch %{buildroot}%{_sysconfdir}/%{name}.{cert,conf,key}
 
@@ -195,20 +228,26 @@ install -d %{buildroot}%{apache_conf}/conf.d
 install -p -m 644 misc/apache/bcfg2.conf %{buildroot}%{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 # Documentation
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
-mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}
-#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
-#mv build/sphinx/html/* %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
-#mv build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}/
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
+cp -a build/sphinx/html/* \
+    %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
+#cp -a build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}/
 
 # Examples
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}
-mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}/
-#mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
-#mv examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}/
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}
+cp -a examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}/
 
+
+%if 0%{?rhel} == 5
+# Required for EL5
 %clean
 rm -rf %{buildroot}
+%endif
+
+
+%check
+%{__python} setup.py test
+
 
 %post
 %if 0%{?fedora} >= 18
@@ -317,7 +356,10 @@ rm -rf %{buildroot}
 /bin/systemctl try-restart bcfg2-server.service >/dev/null 2>&1 || :
 
 %files
+%if 0%{?rhel} == 5
+# Required for EL5
 %defattr(-,root,root,-)
+%endif
 %doc COPYRIGHT LICENSE README
 %{_mandir}/man1/bcfg2.1*
 %{_mandir}/man5/bcfg2*.5*
@@ -345,46 +387,68 @@ rm -rf %{buildroot}
 %{python_sitelib}/Bcfg2/Proxy.*
 %{python_sitelib}/Bcfg2/SSLServer.*
 %{python_sitelib}/Bcfg2/Statistics.*
+%{python_sitelib}/Bcfg2/Utils.*
 %{python_sitelib}/Bcfg2/version.*
 
 %files server
+%if 0%{?rhel} == 5
+# Required for EL5
 %defattr(-,root,root,-)
+%endif
 %{_mandir}/man8/bcfg2*.8*
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.key
 %if 0%{?fedora} >= 16
     %config(noreplace) %{_unitdir}/%{name}-server.service
+%else
+    %{_initrddir}/bcfg2-server
 %endif
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2-server
-%{_initrddir}/bcfg2-server
 %{_datadir}/bcfg2
 %{_sbindir}/bcfg2-*
 %dir %{_var}/lib/bcfg2
 %{python_sitelib}/Bcfg2/Server
 %{python_sitelib}/Bcfg2/Compat.*
 %{python_sitelib}/Bcfg2/version.*
+%{python_sitelib}/Bcfg2/settings.*
 
 %files web
+%if 0%{?rhel} == 5
+# Required for EL5
 %defattr(-,root,root,-)
+%endif
 %{_datadir}/bcfg2/reports.wsgi
 %{_datadir}/bcfg2/site_media
 %{python_sitelib}/Bcfg2/Reporting
 %{python_sitelib}/Bcfg2/manage.*
-%{python_sitelib}/Bcfg2/settings.*
 %config(noreplace) %{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 %files doc
+%if 0%{?rhel} == 5
+# Required for EL5
 %defattr(-,root,root,-)
-%doc %{_defaultdocdir}/bcfg2-doc-%{version}
-#%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre:pre%{_pre}}
-#%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_rc:rc%{_rc}}
+%endif
+%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
 
 %files examples
+%if 0%{?rhel} == 5
+# Required for EL5
 %defattr(-,root,root,-)
-%doc %{_defaultdocdir}/bcfg2-examples-%{version}
-#%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre:pre%{_pre}}
-#%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_rc:rc%{_rc}}
+%endif
+%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}
 
 %changelog
+* Wed Jul  3 2013 John Morris <john@zultron.com> - 1.3.2-1
+- Update to new upstream version 1.3.2
+- Move settings.py into server package (fixes bug reported on bcfg2-dev ML)
+- Use init scripts from redhat/scripts directory
+- Fix EL5/EL6 sphinx docs
+- Require python-inotify instead of gamin-python; recommended by upstream
+- Remove obsolete bcfg2-py27-auth.patch, accepted upstream
+- Add %%check script
+- Cleanups to _pre/_rc macros
+- Mark EL5 relics
+- Other minor formatting
+
 * Mon Apr 08 2013 Fabian Affolter <mail@fabian-affolter.ch> - 1.3.1-1
 - Updated to new upstream version 1.3.1
 
