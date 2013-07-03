@@ -20,6 +20,9 @@ License:          BSD
 URL:              http://bcfg2.org
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar.gz
 Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar.gz.gpg
+# Used in %%check
+Source2:          http://www.w3.org/2001/XMLSchema.xsd
+Source3:          http://www.w3.org/2001/xml.xsd
 %if 0%{?rhel} == 5
 # EL5 requires the BuildRoot tag
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -28,12 +31,35 @@ BuildArch:        noarch
 
 BuildRequires:    python2-devel
 BuildRequires:    python-setuptools
+BuildRequires:    python-daemon
+BuildRequires:    python-inotify
+%if 0%{?rhel} != 5
+# EL5 lacks python-mock, so test suite is disabled
+BuildRequires:    python-sqlalchemy
+BuildRequires:    python-nose
+BuildRequires:    python-mock
+BuildRequires:    mock
+BuildRequires:    m2crypto
+BuildRequires:    Django
+BuildRequires:    PyYAML
+BuildRequires:    python-genshi
+BuildRequires:    python-cheetah
+BuildRequires:    pylibacl
+BuildRequires:    libselinux-python
+BuildRequires:    python-pep8
+# Pylint fails on all distros; reported upstream 2013-07-03
+#BuildRequires:    pylint
+%endif
 
 Requires:         python-lxml
 Requires:         python-nose
+Requires:         m2crypto
 %if 0%{?epel} > 0
 Requires:         python-ssl
 %endif
+Requires:         PyYAML
+Requires:         pylibacl
+Requires:         libselinux-python
 
 %if 0%{?fedora} >= 16
 BuildRequires:    systemd-units
@@ -200,10 +226,13 @@ mkdir -p %{buildroot}%{_var}/cache/bcfg2
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
+%if 0%{?fedora} < 16
+# Install SysV init scripts for EL5/6 and old Fedoras
 install -m 755 redhat/scripts/bcfg2.init \
     %{buildroot}%{_initrddir}/bcfg2
 install -m 755 redhat/scripts/bcfg2-server.init \
     %{buildroot}%{_initrddir}/bcfg2-server
+%endif
 install -m 755 debian/bcfg2.cron.daily \
     %{buildroot}%{_sysconfdir}/cron.daily/bcfg2
 install -m 755 debian/bcfg2.cron.hourly \
@@ -245,8 +274,16 @@ rm -rf %{buildroot}
 %endif
 
 
+%if 0%{?rhel} != 5
+# EL5 lacks python-mock, so test suite is disabled
 %check
+# Downloads not allowed in koji; fix .xsd urls to point to local files
+sed -i "s@schema_url = .*\$@schema_url = 'file://`pwd`/`basename %{SOURCE2}`'@" \
+    testsuite/Testschema/test_schema.py
+sed 's@http://www.w3.org/2001/xml.xsd@file://%{SOURCE3}@' \
+    %{SOURCE2} > `basename %{SOURCE2}`
 %{__python} setup.py test
+%endif
 
 
 %post
@@ -371,7 +408,9 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2
 %{_sysconfdir}/cron.daily/bcfg2
 %{_sysconfdir}/cron.hourly/bcfg2
-%{_initrddir}/bcfg2
+%if 0%{?fedora} < 16
+    %{_initrddir}/bcfg2
+%endif
 %{_sbindir}/bcfg2
 %{_libexecdir}/bcfg2-cron
 %dir %{_var}/cache/bcfg2
@@ -445,6 +484,9 @@ rm -rf %{buildroot}
 - Require python-inotify instead of gamin-python; recommended by upstream
 - Remove obsolete bcfg2-py27-auth.patch, accepted upstream
 - Add %%check script
+  - Hack test suite to use local copies of XMLSchema.xsd and xml.xsd
+  - Many new BRs to support %%check script
+  - Disable %%check script on EL5, where there is no python-mock package
 - Cleanups to _pre/_rc macros
 - Mark EL5 relics
 - Other minor formatting

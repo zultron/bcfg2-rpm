@@ -1,6 +1,8 @@
 # sources
 /bcfg2-1.*.tar.gz
 /bcfg2-1.*.tar.gz.gpg
+/XMLSchema.xsd
+/xml.xsd
 
 # fedpkg local build artifacts
 /.build-*.log
