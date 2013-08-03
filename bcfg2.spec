@@ -11,7 +11,7 @@
 
 Name:             bcfg2
 Version:          1.3.2
-Release:          1%{?dist}
+Release:          2%{?dist}
 #Release:          0.1%{?_pre_rc}
 Summary:          A configuration management system
 
@@ -476,6 +476,9 @@ sed 's@http://www.w3.org/2001/xml.xsd@file://%{SOURCE3}@' \
 %doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}
 
 %changelog
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
 * Wed Jul  3 2013 John Morris <john@zultron.com> - 1.3.2-1
 - Update to new upstream version 1.3.2
 - Move settings.py into server package (fixes bug reported on bcfg2-dev ML)
