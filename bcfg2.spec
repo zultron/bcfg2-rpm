@@ -25,6 +25,8 @@ Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar
 # Used in %%check
 Source2:          http://www.w3.org/2001/XMLSchema.xsd
 Source3:          http://www.w3.org/2001/xml.xsd
+# Pylint fails on all RedHat distros; reported upstream 2013-07-03
+Patch0:           bcfg2-1.3.2.disable_tests.patch
 %if 0%{?rhel} == 5
 # EL5 requires the BuildRoot tag
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -53,8 +55,7 @@ BuildRequires:    libselinux-python
 BuildRequires:    python-pep8
 BuildRequires:    python-cherrypy >= 3
 BuildRequires:    python-mock
-# Pylint fails on all distros; reported upstream 2013-07-03
-#BuildRequires:    pylint
+BuildRequires:    pylint
 %endif # rhel > 5
 
 # RHEL 5 and 6 ship with sphinx 0.6, but sphinx 1.0 is available with
@@ -327,6 +328,7 @@ This package includes the examples files for Bcfg2.
 
 %prep
 %setup -q -n %{name}-%{version}%{?_pre_rc}
+%patch0 -p1 -b .disable_tests
 
 # Fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
