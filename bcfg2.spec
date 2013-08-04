@@ -331,16 +331,10 @@ This package includes the examples files for Bcfg2.
 %patch0 -p1 -b .disable_tests
 
 # Fixup some paths
-%{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2.init
-%{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' debian/bcfg2-server.init
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' tools/bcfg2-cron
 
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.daily
 %{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.hourly
-
-# Don't start servers by default
-%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/bcfg2.init
-%{__perl} -pi -e 's@chkconfig: (\d+)@chkconfig: -@' debian/bcfg2-server.init
 
 # Get rid of extraneous shebangs
 for f in `find src/lib -name \*.py`
@@ -348,15 +342,13 @@ do
     %{__sed} -i -e '/^#!/,1d' $f
 done
 
+sed -i "s/apache2/httpd/g" misc/apache/bcfg2.conf
+
 
 %build
 %{__python} setup.py build
-#%{__python} setup.py build_dtddoc
 %{?pythonpath: PYTHONPATH="%{pythonpath}"} \
     %{__python} setup.py build_sphinx
-
-#%{?pythonpath: export PYTHONPATH="%{pythonpath}"}
-#%{__python}%{python_version} setup.py build_dtddoc
 
 
 %install
