@@ -537,83 +537,87 @@ sed 's@http://www.w3.org/2001/xml.xsd@file://%{SOURCE3}@' \
 %endif
 %doc COPYRIGHT LICENSE README
 %{_mandir}/man1/bcfg2.1*
-%{_mandir}/man5/bcfg2*.5*
-%ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.cert
-%ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.conf
+%{_mandir}/man5/bcfg2.conf.5*
+%ghost %attr(600,root,root) %config(noreplace,missingok) %{_sysconfdir}/bcfg2.cert
+%ghost %attr(0600,root,root) %config(noreplace,missingok) %{_sysconfdir}/bcfg2.conf
 %if 0%{?fedora} >= 16
     %config(noreplace) %{_unitdir}/%{name}.service
+%else
+    %{_initrddir}/bcfg2
 %endif
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2
 %{_sysconfdir}/cron.daily/bcfg2
 %{_sysconfdir}/cron.hourly/bcfg2
-%if 0%{?fedora} < 16
-    %{_initrddir}/bcfg2
-%endif
 %{_sbindir}/bcfg2
 %{_libexecdir}/bcfg2-cron
-%dir %{_var}/cache/bcfg2
+%dir %{_localstatedir}/cache/%{name}
 %{python_sitelib}/Bcfg2*.egg-info
 %dir %{python_sitelib}/Bcfg2
-%{python_sitelib}/Bcfg2/__init__.*
+%{python_sitelib}/Bcfg2/__init__.py*
 %{python_sitelib}/Bcfg2/Client
-%{python_sitelib}/Bcfg2/Cache.*
-%{python_sitelib}/Bcfg2/Compat.*
-%{python_sitelib}/Bcfg2/Encryption.*
-%{python_sitelib}/Bcfg2/Logger.*
-%{python_sitelib}/Bcfg2/Options.*
-%{python_sitelib}/Bcfg2/Proxy.*
-%{python_sitelib}/Bcfg2/SSLServer.*
-%{python_sitelib}/Bcfg2/Statistics.*
-%{python_sitelib}/Bcfg2/Utils.*
-%{python_sitelib}/Bcfg2/version.*
+%{python_sitelib}/Bcfg2/Compat.py*
+%{python_sitelib}/Bcfg2/Logger.py*
+%{python_sitelib}/Bcfg2/Options.py*
+%{python_sitelib}/Bcfg2/Proxy.py*
+%{python_sitelib}/Bcfg2/Utils.py*
+%{python_sitelib}/Bcfg2/version.py*
 
 %files server
 %if 0%{?rhel} == 5
-# Required for EL5
 %defattr(-,root,root,-)
 %endif
-%{_mandir}/man8/bcfg2*.8*
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.key
 %if 0%{?fedora} >= 16
     %config(noreplace) %{_unitdir}/%{name}-server.service
 %else
     %{_initrddir}/bcfg2-server
+    %{_initrddir}/bcfg2-report-collector
 %endif
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2-server
-%{_datadir}/bcfg2
 %{_sbindir}/bcfg2-*
-%dir %{_var}/lib/bcfg2
+%dir %{_localstatedir}/lib/%{name}
+%{python_sitelib}/Bcfg2/Cache.py*
+%{python_sitelib}/Bcfg2/Encryption.py*
+%{python_sitelib}/Bcfg2/SSLServer.py*
+%{python_sitelib}/Bcfg2/Statistics.py*
+%{python_sitelib}/Bcfg2/settings.py*
 %{python_sitelib}/Bcfg2/Server
-%{python_sitelib}/Bcfg2/Compat.*
-%{python_sitelib}/Bcfg2/version.*
-%{python_sitelib}/Bcfg2/settings.*
 %exclude %{python_sitelib}/Bcfg2/Server/CherryPyCore.py
 
+%dir %{_datadir}/bcfg2
+%{_datadir}/bcfg2/Hostbase
+%{_datadir}/bcfg2/schemas
+%{_datadir}/bcfg2/xsl-transforms
+
+%{_mandir}/man5/bcfg2-lint.conf.5*
+%{_mandir}/man8/bcfg2*.8*
+
+%doc tools/*
+
 %files server-cherrypy
+%if 0%{?rhel} == 5
 %defattr(-,root,root,-)
+%endif
 %{python_sitelib}/Bcfg2/Server/CherryPyCore.py
 
 %files web
 %if 0%{?rhel} == 5
-# Required for EL5
 %defattr(-,root,root,-)
 %endif
 %{_datadir}/bcfg2/reports.wsgi
 %{_datadir}/bcfg2/site_media
 %{python_sitelib}/Bcfg2/Reporting
-%{python_sitelib}/Bcfg2/manage.*
+%{python_sitelib}/Bcfg2/manage.py*
 %config(noreplace) %{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 %files doc
 %if 0%{?rhel} == 5
-# Required for EL5
 %defattr(-,root,root,-)
 %endif
 %doc build/sphinx/html/*
 
 %files examples
 %if 0%{?rhel} == 5
-# Required for EL5
 %defattr(-,root,root,-)
 %endif
 %doc examples/*
