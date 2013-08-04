@@ -29,15 +29,17 @@ BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %endif
 BuildArch:        noarch
 
-BuildRequires:    python2-devel
-BuildRequires:    python-setuptools
+BuildRequires:    python
+BuildRequires:    python-devel
+BuildRequires:    python-lxml
 BuildRequires:    python-daemon
 BuildRequires:    python-inotify
-%if 0%{?rhel} != 5
+%if 0%{?rhel} && 0%{?rhel} < 6
+BuildRequires:    python-ssl
+%else # rhel > 5
 # EL5 lacks python-mock, so test suite is disabled
 BuildRequires:    python-sqlalchemy
 BuildRequires:    python-nose
-BuildRequires:    python-mock
 BuildRequires:    mock
 BuildRequires:    m2crypto
 BuildRequires:    Django
@@ -47,14 +49,30 @@ BuildRequires:    python-cheetah
 BuildRequires:    pylibacl
 BuildRequires:    libselinux-python
 BuildRequires:    python-pep8
+BuildRequires:    python-mock
 # Pylint fails on all distros; reported upstream 2013-07-03
 #BuildRequires:    pylint
+%endif # rhel > 5
+
+# RHEL 5 and 6 ship with sphinx 0.6, but sphinx 1.0 is available with
+# a different package name in EPEL.
+%if 0%{?rhel}
+BuildRequires:    python-sphinx10
+# python-sphinx10 doesn't set sys.path correctly; do it for them
+%global pythonpath %(find %{python_sitelib} -name Sphinx*.egg)
+%else
+BuildRequires:    python-sphinx >= 1.0
+%endif
+BuildRequires:    python-docutils
+
+%if 0%{?fedora} >= 16
+BuildRequires:    systemd-units
 %endif
 
 Requires:         python-lxml
 Requires:         python-nose
 Requires:         m2crypto
-%if 0%{?epel} > 0
+%if 0%{?rhel} && 0%{?rhel} < 6
 Requires:         python-ssl
 %endif
 Requires:         PyYAML
@@ -62,7 +80,6 @@ Requires:         pylibacl
 Requires:         libselinux-python
 
 %if 0%{?fedora} >= 16
-BuildRequires:    systemd-units
 Requires(post):   systemd-units
 Requires(preun):  systemd-units
 Requires(postun): systemd-units
@@ -106,20 +123,17 @@ This package includes the Bcfg2 client software.
 Summary:          Bcfg2 Server
 Group:            System Environment/Daemons
 Requires:         bcfg2 = %{version}-%{release}
+Requires:         python-lxml >= 1.2.1
+Requires:         python-inotify
+Requires:         python-daemon
 Requires:         /usr/sbin/sendmail
 Requires:         /usr/bin/openssl
-Requires:         python-inotify
 Requires:         python-genshi
 Requires:         python-cheetah
 Requires:         graphviz
-Requires:         python-daemon
-Requires:         python-lxml
-%if "%{python_version}" < "2.6"
-# EL5
-Requires:         python-ssl
-%endif
+Requires:         python-nose
+
 %if 0%{?fedora} >= 16
-BuildRequires:    systemd-units
 Requires(post):   systemd-units
 Requires(preun):  systemd-units
 Requires(postun): systemd-units
@@ -165,16 +179,12 @@ This package includes the Bcfg2 server software.
 Summary:          Bcfg2 Web Reporting Interface
 Group:            System Tools
 
-Requires:         bcfg2-server
+Requires:         Django >= 1.2
+Requires:         Django-south >= 0.7
 Requires:         httpd
-Requires:         Django
-%if "%{_vendor}" == "redhat"
-Requires: mod_wsgi
-%define apache_conf %{_sysconfdir}/httpd
-%else
-Requires: apache2-mod_wsgi
-%define apache_conf %{_sysconfdir}/apache2
-%endif
+Requires:         mod_wsgi
+
+%global apache_conf %{_sysconfdir}/httpd
 
 %description web
 Bcfg2 helps system administrators produce a consistent, reproducible,
@@ -208,17 +218,6 @@ This package includes the Bcfg2 reports web frontend.
 %package doc
 Summary:          Documentation for Bcfg2
 Group:            Documentation
-
-%if 0%{?rhel}
-# EL5/6 sphinx 0.6 is too old; use sphinx 1.0 from EPEL
-BuildRequires: python-sphinx10
-# python-sphinx10 doesn't set sys.path correctly; do it for them
-%define pythonpath %(find %{python_sitelib} -name Sphinx*.egg)
-%else
-BuildRequires: python-sphinx >= 1.0
-%endif
-BuildRequires:    python-docutils
-BuildRequires:    python-lxml
 
 
 %description doc
