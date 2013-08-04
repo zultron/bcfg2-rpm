@@ -84,16 +84,26 @@ National Laboratory.
 
 It is based on an operational model in which the specification can be
 used to validate and optionally change the state of clients, but in a
-feature unique to Bcfg2 the client's response to the specification can
+feature unique to bcfg2 the client's response to the specification can
 also be used to assess the completeness of the specification. Using
 this feature, bcfg2 provides an objective measure of how good a job an
 administrator has done in specifying the configuration of client
 systems. Bcfg2 is therefore built to help administrators construct an
 accurate, comprehensive specification.
 
+Bcfg2 has been designed from the ground up to support gentle
+reconciliation between the specification and current client states. It
+is designed to gracefully cope with manual system modifications.
+
+Finally, due to the rapid pace of updates on modern networks, client
+systems are constantly changing; if required in your environment,
+Bcfg2 can enable the construction of complex change management and
+deployment strategies.
+
+This package includes the Bcfg2 client software.
 
 %package server
-Summary:          Configuration management server
+Summary:          Bcfg2 Server
 Group:            System Environment/Daemons
 Requires:         bcfg2 = %{version}-%{release}
 Requires:         /usr/sbin/sendmail
@@ -123,12 +133,37 @@ Requires(postun): /sbin/service
 
 
 %description server
-Configuration management server
+Bcfg2 helps system administrators produce a consistent, reproducible,
+and verifiable description of their environment, and offers
+visualization and reporting tools to aid in day-to-day administrative
+tasks. It is the fifth generation of configuration management tools
+developed in the Mathematics and Computer Science Division of Argonne
+National Laboratory.
+
+It is based on an operational model in which the specification can be
+used to validate and optionally change the state of clients, but in a
+feature unique to bcfg2 the client's response to the specification can
+also be used to assess the completeness of the specification. Using
+this feature, bcfg2 provides an objective measure of how good a job an
+administrator has done in specifying the configuration of client
+systems. Bcfg2 is therefore built to help administrators construct an
+accurate, comprehensive specification.
+
+Bcfg2 has been designed from the ground up to support gentle
+reconciliation between the specification and current client states. It
+is designed to gracefully cope with manual system modifications.
+
+Finally, due to the rapid pace of updates on modern networks, client
+systems are constantly changing; if required in your environment,
+Bcfg2 can enable the construction of complex change management and
+deployment strategies.
+
+This package includes the Bcfg2 server software.
 
 
 %package web
 Summary:          Bcfg2 Web Reporting Interface
-Group:            System
+Group:            System Tools
 
 Requires:         bcfg2-server
 Requires:         httpd
@@ -141,14 +176,38 @@ Requires: apache2-mod_wsgi
 %define apache_conf %{_sysconfdir}/apache2
 %endif
 
-
 %description web
-The Bcfg2 Web Reporting Interface.
+Bcfg2 helps system administrators produce a consistent, reproducible,
+and verifiable description of their environment, and offers
+visualization and reporting tools to aid in day-to-day administrative
+tasks. It is the fifth generation of configuration management tools
+developed in the Mathematics and Computer Science Division of Argonne
+National Laboratory.
+
+It is based on an operational model in which the specification can be
+used to validate and optionally change the state of clients, but in a
+feature unique to bcfg2 the client's response to the specification can
+also be used to assess the completeness of the specification. Using
+this feature, bcfg2 provides an objective measure of how good a job an
+administrator has done in specifying the configuration of client
+systems. Bcfg2 is therefore built to help administrators construct an
+accurate, comprehensive specification.
+
+Bcfg2 has been designed from the ground up to support gentle
+reconciliation between the specification and current client states. It
+is designed to gracefully cope with manual system modifications.
+
+Finally, due to the rapid pace of updates on modern networks, client
+systems are constantly changing; if required in your environment,
+Bcfg2 can enable the construction of complex change management and
+deployment strategies.
+
+This package includes the Bcfg2 reports web frontend.
 
 
 %package doc
 Summary:          Documentation for Bcfg2
-Group:            System
+Group:            Documentation
 
 %if 0%{?rhel}
 # EL5/6 sphinx 0.6 is too old; use sphinx 1.0 from EPEL
@@ -163,16 +222,66 @@ BuildRequires:    python-lxml
 
 
 %description doc
-Documentation for Bcfg2.
+Bcfg2 helps system administrators produce a consistent, reproducible,
+and verifiable description of their environment, and offers
+visualization and reporting tools to aid in day-to-day administrative
+tasks. It is the fifth generation of configuration management tools
+developed in the Mathematics and Computer Science Division of Argonne
+National Laboratory.
+
+It is based on an operational model in which the specification can be
+used to validate and optionally change the state of clients, but in a
+feature unique to bcfg2 the client's response to the specification can
+also be used to assess the completeness of the specification. Using
+this feature, bcfg2 provides an objective measure of how good a job an
+administrator has done in specifying the configuration of client
+systems. Bcfg2 is therefore built to help administrators construct an
+accurate, comprehensive specification.
+
+Bcfg2 has been designed from the ground up to support gentle
+reconciliation between the specification and current client states. It
+is designed to gracefully cope with manual system modifications.
+
+Finally, due to the rapid pace of updates on modern networks, client
+systems are constantly changing; if required in your environment,
+Bcfg2 can enable the construction of complex change management and
+deployment strategies.
+
+This package includes the Bcfg2 documentation.
 
 
 %package examples
 Summary:          Examples for Bcfg2
-Group:            System
+Group:            Documentation
 
 
 %description examples
-Examples files for Bcfg2.
+Bcfg2 helps system administrators produce a consistent, reproducible,
+and verifiable description of their environment, and offers
+visualization and reporting tools to aid in day-to-day administrative
+tasks. It is the fifth generation of configuration management tools
+developed in the Mathematics and Computer Science Division of Argonne
+National Laboratory.
+
+It is based on an operational model in which the specification can be
+used to validate and optionally change the state of clients, but in a
+feature unique to bcfg2 the client's response to the specification can
+also be used to assess the completeness of the specification. Using
+this feature, bcfg2 provides an objective measure of how good a job an
+administrator has done in specifying the configuration of client
+systems. Bcfg2 is therefore built to help administrators construct an
+accurate, comprehensive specification.
+
+Bcfg2 has been designed from the ground up to support gentle
+reconciliation between the specification and current client states. It
+is designed to gracefully cope with manual system modifications.
+
+Finally, due to the rapid pace of updates on modern networks, client
+systems are constantly changing; if required in your environment,
+Bcfg2 can enable the construction of complex change management and
+deployment strategies.
+
+This package includes the examples files for Bcfg2.
 
 
 %prep
