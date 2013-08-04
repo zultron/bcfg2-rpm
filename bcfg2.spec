@@ -49,6 +49,7 @@ BuildRequires:    python-cheetah
 BuildRequires:    pylibacl
 BuildRequires:    libselinux-python
 BuildRequires:    python-pep8
+BuildRequires:    python-cherrypy >= 3
 BuildRequires:    python-mock
 # Pylint fails on all distros; reported upstream 2013-07-03
 #BuildRequires:    pylint
@@ -174,6 +175,44 @@ deployment strategies.
 
 This package includes the Bcfg2 server software.
 
+%package server-cherrypy
+Summary:          Bcfg2 Server - CherryPy backend
+Group:            System Environment/Daemons
+Requires:         bcfg2 = %{version}-%{release}
+Requires:         bcfg2-server = %{version}-%{release}
+
+# cherrypy 3.3 actually doesn't exist yet, but 3.2 has bugs that
+# prevent it from working:
+# https://bitbucket.org/cherrypy/cherrypy/issue/1154/assertionerror-in-recv-when-ssl-is-enabled
+Requires:         python-cherrypy > 3.3
+
+%description server-cherrypy
+Bcfg2 helps system administrators produce a consistent, reproducible,
+and verifiable description of their environment, and offers
+visualization and reporting tools to aid in day-to-day administrative
+tasks. It is the fifth generation of configuration management tools
+developed in the Mathematics and Computer Science Division of Argonne
+National Laboratory.
+
+It is based on an operational model in which the specification can be
+used to validate and optionally change the state of clients, but in a
+feature unique to bcfg2 the client's response to the specification can
+also be used to assess the completeness of the specification. Using
+this feature, bcfg2 provides an objective measure of how good a job an
+administrator has done in specifying the configuration of client
+systems. Bcfg2 is therefore built to help administrators construct an
+accurate, comprehensive specification.
+
+Bcfg2 has been designed from the ground up to support gentle
+reconciliation between the specification and current client states. It
+is designed to gracefully cope with manual system modifications.
+
+Finally, due to the rapid pace of updates on modern networks, client
+systems are constantly changing; if required in your environment,
+Bcfg2 can enable the construction of complex change management and
+deployment strategies.
+
+This package includes the Bcfg2 CherryPy server backend.
 
 %package web
 Summary:          Bcfg2 Web Reporting Interface
@@ -185,6 +224,7 @@ Requires:         httpd
 Requires:         mod_wsgi
 
 %global apache_conf %{_sysconfdir}/httpd
+
 
 %description web
 Bcfg2 helps system administrators produce a consistent, reproducible,
@@ -557,6 +597,11 @@ sed 's@http://www.w3.org/2001/xml.xsd@file://%{SOURCE3}@' \
 %{python_sitelib}/Bcfg2/Compat.*
 %{python_sitelib}/Bcfg2/version.*
 %{python_sitelib}/Bcfg2/settings.*
+%exclude %{python_sitelib}/Bcfg2/Server/CherryPyCore.py
+
+%files server-cherrypy
+%defattr(-,root,root,-)
+%{python_sitelib}/Bcfg2/Server/CherryPyCore.py
 
 %files web
 %if 0%{?rhel} == 5
