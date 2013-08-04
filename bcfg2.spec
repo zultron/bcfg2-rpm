@@ -357,25 +357,27 @@ sed -i "s/apache2/httpd/g" misc/apache/bcfg2.conf
 rm -rf %{buildroot}
 %endif
 
-%{__python} setup.py install -O1 --skip-build --root=%{buildroot}
-
-mkdir -p %{buildroot}%{_sbindir}
-mkdir -p %{buildroot}%{_initrddir}
-mkdir -p %{buildroot}%{_sysconfdir}/cron.daily
-mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
-mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
-mkdir -p %{buildroot}%{_libexecdir}
-mkdir -p %{buildroot}%{_var}/lib/bcfg2
-mkdir -p %{buildroot}%{_var}/cache/bcfg2
+%{__python} setup.py install -O1 --skip-build --root=%{buildroot} --prefix=/usr
+install -d %{buildroot}%{_bindir}
+install -d %{buildroot}%{_sbindir}
+install -d %{buildroot}%{_initrddir}
+install -d %{buildroot}%{_sysconfdir}/cron.daily
+install -d %{buildroot}%{_sysconfdir}/cron.hourly
+install -d %{buildroot}%{_sysconfdir}/sysconfig
+install -d %{buildroot}%{_libexecdir}
+install -d %{buildroot}%{_localstatedir}/cache/%{name}
+install -d %{buildroot}%{_localstatedir}/lib/%{name}
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
 %if 0%{?fedora} < 16
-# Install SysV init scripts for EL5/6 and old Fedoras
+# Install SysV init scripts for everyone but new Fedoras
 install -m 755 redhat/scripts/bcfg2.init \
     %{buildroot}%{_initrddir}/bcfg2
 install -m 755 redhat/scripts/bcfg2-server.init \
     %{buildroot}%{_initrddir}/bcfg2-server
+install -m 755 redhat/scripts/bcfg2-report-collector.init \
+    %{buildroot}%{_initrddir}/bcfg2-report-collector
 %endif
 install -m 755 debian/bcfg2.cron.daily \
     %{buildroot}%{_sysconfdir}/cron.daily/bcfg2
@@ -392,9 +394,11 @@ install -m 644 debian/bcfg2-server.default \
 touch %{buildroot}%{_sysconfdir}/%{name}.{cert,conf,key}
 
 # systemd
-mkdir -p %{buildroot}%{_unitdir}
-install -p -m 644 redhat/systemd/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
-install -p -m 644 redhat/systemd/%{name}-server.service %{buildroot}%{_unitdir}/%{name}-server.service
+install -d %{buildroot}%{_unitdir}
+install -p -m 644 redhat/systemd/%{name}.service \
+    %{buildroot}%{_unitdir}/%{name}.service
+install -p -m 644 redhat/systemd/%{name}-server.service \
+    %{buildroot}%{_unitdir}/%{name}-server.service
 
 # Webserver
 install -d %{buildroot}%{apache_conf}/conf.d
