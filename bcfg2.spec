@@ -404,18 +404,8 @@ install -p -m 644 redhat/systemd/%{name}-server.service %{buildroot}%{_unitdir}/
 
 # Webserver
 install -d %{buildroot}%{apache_conf}/conf.d
-install -p -m 644 misc/apache/bcfg2.conf %{buildroot}%{apache_conf}/conf.d/wsgi_bcfg2.conf
-
-# Documentation
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
-cp -a build/sphinx/html/* \
-    %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
-#cp -a build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}/
-
-# Examples
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}
-cp -a examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}/
-
+install -p -m 644 misc/apache/bcfg2.conf \
+    %{buildroot}%{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 %if 0%{?rhel} == 5
 # Required for EL5
@@ -621,14 +611,14 @@ sed 's@http://www.w3.org/2001/xml.xsd@file://%{SOURCE3}@' \
 # Required for EL5
 %defattr(-,root,root,-)
 %endif
-%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
+%doc build/sphinx/html/*
 
 %files examples
 %if 0%{?rhel} == 5
 # Required for EL5
 %defattr(-,root,root,-)
 %endif
-%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}
+%doc examples/*
 
 %changelog
 * Wed Jul  3 2013 John Morris <john@zultron.com> - 1.3.2-1
