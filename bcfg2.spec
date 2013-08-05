@@ -14,7 +14,7 @@
 
 Name:             bcfg2
 Version:          1.3.2
-Release:          1%{?_pre_rc}%{?dist}
+Release:          2%{?_pre_rc}%{?dist}
 Summary:          A configuration management system
 
 Group:            Applications/System
@@ -623,6 +623,20 @@ sed 's@http://www.w3.org/2001/xml.xsd@file://%{SOURCE3}@' \
 %doc examples/*
 
 %changelog
+* Sun Aug 04 2013 John Morris <john@zultron.com> - 1.3.2-2
+- Reconcile divergences with upstream specfile, as requested by upstream
+  (equally large changes made upstream version to reconcile with
+  Fedora package)
+- Move BRs to top of file
+- Rearrange lines to match upstream
+- Change %%descriptions to match upstream
+- Group: tag tweaks
+- Slim down file tweaks in %%prep section; fix apache config paths
+- Install report collector init file
+- Separate server-cherrypy package
+- Rearrange %%files sections
+- Disable two unit tests that break on all RH distros
+
 * Wed Jul  3 2013 John Morris <john@zultron.com> - 1.3.2-1
 - Update to new upstream version 1.3.2
 - Move settings.py into server package (fixes bug reported on bcfg2-dev ML)
