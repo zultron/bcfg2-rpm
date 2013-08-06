@@ -25,8 +25,6 @@ Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar
 # Used in %%check
 Source2:          http://www.w3.org/2001/XMLSchema.xsd
 Source3:          http://www.w3.org/2001/xml.xsd
-# Pylint fails on all RedHat distros; reported upstream 2013-07-03
-Patch0:           bcfg2-1.3.2.disable_tests.patch
 %if 0%{?rhel} == 5
 # EL5 requires the BuildRoot tag
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -328,7 +326,17 @@ This package includes the examples files for Bcfg2.
 
 %prep
 %setup -q -n %{name}-%{version}%{?_pre_rc}
-%patch0 -p1 -b .disable_tests
+
+# The pylint and pep8 unit tests fail on RH-derivative distros
+mv testsuite/Testsrc/test_code_checks.py \
+    testsuite/Testsrc/test_code_checks.py.disable_unit_tests
+awk '
+    BEGIN {line=0}
+    /class Test(Pylint|PEP8)/ {line=FNR+1}
+    FNR==line {sub("True","False")}
+    {print $0}
+    ' testsuite/Testsrc/test_code_checks.py.disable_unit_tests \
+    > testsuite/Testsrc/test_code_checks.py
 
 # Fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' tools/bcfg2-cron
