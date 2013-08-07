@@ -35,10 +35,14 @@ BuildRequires:    python-devel
 BuildRequires:    python-lxml
 BuildRequires:    python-daemon
 BuildRequires:    python-inotify
-%if 0%{?rhel} && 0%{?rhel} < 6
+# if the %%rhel macro is missing, assume el5 or earlier
+%if ( 0%{!?rhel:1} && 0%{!?fedora:1} ) || ( 0%{?rhel} && 0%{?rhel} < 6 )
+# require the %%rhel macro
+BuildRequires:    buildsys-macros
+# before python 2.6, the ssl module was separate
 BuildRequires:    python-ssl
+# EL5 lacks python-mock, so unit tests are disabled
 %else # rhel > 5
-# EL5 lacks python-mock, so test suite is disabled
 BuildRequires:    python-sqlalchemy
 BuildRequires:    python-nose
 BuildRequires:    mock
