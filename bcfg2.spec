@@ -11,7 +11,7 @@
 
 Name:             bcfg2
 Version:          1.3.2
-Release:          2%{?dist}
+Release:          3%{?dist}
 #Release:          0.1%{?_pre_rc}
 Summary:          A configuration management system
 
@@ -73,7 +73,6 @@ Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
 %endif
 
-
 %description
 Bcfg2 helps system administrators produce a consistent, reproducible,
 and verifiable description of their environment, and offers
@@ -90,7 +89,6 @@ this feature, bcfg2 provides an objective measure of how good a job an
 administrator has done in specifying the configuration of client
 systems. Bcfg2 is therefore built to help administrators construct an
 accurate, comprehensive specification.
-
 
 %package server
 Summary:          Configuration management server
@@ -121,10 +119,8 @@ Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
 %endif
 
-
 %description server
 Configuration management server
-
 
 %package web
 Summary:          Bcfg2 Web Reporting Interface
@@ -141,10 +137,8 @@ Requires: apache2-mod_wsgi
 %define apache_conf %{_sysconfdir}/apache2
 %endif
 
-
 %description web
 The Bcfg2 Web Reporting Interface.
-
 
 %package doc
 Summary:          Documentation for Bcfg2
@@ -161,19 +155,15 @@ BuildRequires: python-sphinx >= 1.0
 BuildRequires:    python-docutils
 BuildRequires:    python-lxml
 
-
 %description doc
 Documentation for Bcfg2.
-
 
 %package examples
 Summary:          Examples for Bcfg2
 Group:            System
 
-
 %description examples
 Examples files for Bcfg2.
-
 
 %prep
 %setup -q -n %{name}-%{version}%{?_pre_rc}
@@ -196,7 +186,6 @@ do
     %{__sed} -i -e '/^#!/,1d' $f
 done
 
-
 %build
 %{__python} setup.py build
 #%{__python} setup.py build_dtddoc
@@ -205,7 +194,6 @@ done
 
 #%{?pythonpath: export PYTHONPATH="%{pythonpath}"}
 #%{__python}%{python_version} setup.py build_dtddoc
-
 
 %install
 %if 0%{?rhel} == 5
@@ -257,22 +245,20 @@ install -d %{buildroot}%{apache_conf}/conf.d
 install -p -m 644 misc/apache/bcfg2.conf %{buildroot}%{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 # Documentation
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-doc
 cp -a build/sphinx/html/* \
-    %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
-#cp -a build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}/
+    %{buildroot}%{_defaultdocdir}/bcfg2-doc
+#cp -a build/dtd %{buildroot}%{_defaultdocdir}/bcfg2-doc/
 
 # Examples
-mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}
-cp -a examples %{buildroot}%{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}/
-
+mkdir -p %{buildroot}%{_defaultdocdir}/bcfg2-examples
+cp -a examples %{buildroot}%{_defaultdocdir}/bcfg2-examples/
 
 %if 0%{?rhel} == 5
 # Required for EL5
 %clean
 rm -rf %{buildroot}
 %endif
-
 
 %if 0%{?rhel} != 5
 # EL5 lacks python-mock, so test suite is disabled
@@ -284,7 +270,6 @@ sed 's@http://www.w3.org/2001/xml.xsd@file://%{SOURCE3}@' \
     %{SOURCE2} > `basename %{SOURCE2}`
 %{__python} setup.py test
 %endif
-
 
 %post
 %if 0%{?fedora} >= 18
@@ -466,16 +451,19 @@ sed 's@http://www.w3.org/2001/xml.xsd@file://%{SOURCE3}@' \
 # Required for EL5
 %defattr(-,root,root,-)
 %endif
-%doc %{_defaultdocdir}/bcfg2-doc-%{version}%{?_pre_rc}
+%doc %{_defaultdocdir}/bcfg2-doc
 
 %files examples
 %if 0%{?rhel} == 5
 # Required for EL5
 %defattr(-,root,root,-)
 %endif
-%doc %{_defaultdocdir}/bcfg2-examples-%{version}%{?_pre_rc}
+%doc %{_defaultdocdir}/bcfg2-examples
 
 %changelog
+* Fri Aug 09 2013 Fabian Affolter <mail@fabian-affolter.ch> - 1.3.2-3
+- Fix #993681
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
