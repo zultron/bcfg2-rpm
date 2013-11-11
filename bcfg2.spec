@@ -1,7 +1,17 @@
 # Fedora 13+ and EL6 contain these macros already; only needed for EL5
-%if 0%{?rhel} == 5
+%if 0%{?rhel} && 0%{?rhel} <= 5
 %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
 %define python_version %(%{__python} -c 'import sys;print(sys.version[0:3])')
+%endif
+
+# openSUSE macro translation
+%if 0%{?suse_version}
+%global python_version %{py_ver}
+%{!?_initrddir: %global _initrddir %{_sysconfdir}/rc.d/init.d}
+# openSUSE < 11.2
+%if %{suse_version} < 1120
+%global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
+%endif
 %endif
 
 # For -pre or -rc releases, remove the initial <hash><percent>
@@ -10,22 +20,26 @@
 # Don't forget to change the Release: tag below to something like 0.1
 #%%global _rc 1
 #%%global _pre 2
-%global _pre_rc %{?_pre:pre%{_pre}}%{?_rc:rc%{_rc}}
+%global _pre_rc %{?_pre:.pre%{_pre}}%{?_rc:.rc%{_rc}}
 
 Name:             bcfg2
-Version:          1.3.2
-Release:          2%{?_pre_rc}%{?dist}
+Version:          1.3.3
+Release:          1%{?_pre_rc}%{?dist}
 Summary:          A configuration management system
 
+%if 0%{?suse_version}
+# http://en.opensuse.org/openSUSE:Package_group_guidelines
+Group:            System/Management
+%else
 Group:            Applications/System
+%endif
 License:          BSD
 URL:              http://bcfg2.org
 Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar.gz
-Source1:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar.gz.gpg
 # Used in %%check
-Source2:          http://www.w3.org/2001/XMLSchema.xsd
-%if 0%{?rhel} == 5
-# EL5 requires the BuildRoot tag
+Source1:          http://www.w3.org/2001/XMLSchema.xsd
+%if %{?rhel}%{!?rhel:10} <= 5 || 0%{?suse_version}
+# EL5 and OpenSUSE require the BuildRoot tag
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %endif
 BuildArch:        noarch
@@ -33,22 +47,32 @@ BuildArch:        noarch
 BuildRequires:    python
 BuildRequires:    python-devel
 BuildRequires:    python-lxml
+BuildRequires:    python-boto
+%if 0%{?suse_version}
+BuildRequires:    python-M2Crypto
+BuildRequires:    python-Genshi
+BuildRequires:    python-gamin
+BuildRequires:    python-pyinotify
+BuildRequires:    python-python-daemon
+BuildRequires:    python-CherryPy >= 3
+%else # ! suse_version
 BuildRequires:    python-daemon
 BuildRequires:    python-inotify
-# if the %%rhel macro is missing, assume el5 or earlier
-%if ( 0%{!?rhel:1} && 0%{!?fedora:1} ) || ( 0%{?rhel} && 0%{?rhel} < 6 )
-# require the %%rhel macro
+%if "%{_vendor}" == "redhat" && 0%{!?rhel:1} && 0%{!?fedora:1}
+# by default, el5 doesn't have the %%rhel macro, provided by this
+# package; EPEL build servers install buildsys-macros by default, but
+# explicitly requiring this may help builds in other environments
 BuildRequires:    buildsys-macros
-# before python 2.6, the ssl module was separate
+%else # vendor != redhat || rhel defined
+%if 0%{?rhel} && 0%{?rhel} < 6
 BuildRequires:    python-ssl
-# EL5 lacks python-mock, so unit tests are disabled
 %else # rhel > 5
+# EL5 lacks python-mock, so test suite is disabled
 BuildRequires:    python-sqlalchemy
 BuildRequires:    python-nose
 BuildRequires:    mock
 BuildRequires:    m2crypto
 BuildRequires:    Django
-BuildRequires:    PyYAML
 BuildRequires:    python-genshi
 BuildRequires:    python-cheetah
 BuildRequires:    pylibacl
@@ -58,10 +82,24 @@ BuildRequires:    python-cherrypy >= 3
 BuildRequires:    python-mock
 BuildRequires:    pylint
 %endif # rhel > 5
+%endif # vendor != redhat || rhel defined
+%endif # ! suse_version
+
+%if 0%{?mandriva_version}
+# mandriva seems to behave differently than other distros and needs
+# this explicitly.
+BuildRequires:    python-setuptools
+%endif
+%if 0%{?mandriva_version} == 201100
+# mandriva 2011 has multiple providers for libsane, so (at least when
+# building on OBS) one must be chosen explicitly: "have choice for
+# libsane.so.1 needed by python-imaging: libsane1 sane-backends-iscan"
+BuildRequires:    libsane1
+%endif
 
 # RHEL 5 and 6 ship with sphinx 0.6, but sphinx 1.0 is available with
 # a different package name in EPEL.
-%if 0%{?rhel}
+%if "%{_vendor}" == "redhat" && 0%{?rhel} <= 6 && 0%{?fedora} == 0
 BuildRequires:    python-sphinx10
 # python-sphinx10 doesn't set sys.path correctly; do it for them
 %global pythonpath %(find %{python_sitelib} -name Sphinx*.egg)
@@ -75,13 +113,9 @@ BuildRequires:    systemd-units
 %endif
 
 Requires:         python-lxml
-Requires:         python-nose
-Requires:         m2crypto
 %if 0%{?rhel} && 0%{?rhel} < 6
 Requires:         python-ssl
 %endif
-Requires:         PyYAML
-Requires:         pylibacl
 Requires:         libselinux-python
 
 %if 0%{?fedora} >= 16
@@ -93,6 +127,11 @@ Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
+%endif
+
+%if "%{_vendor}" != "redhat"
+# fedora and rhel (and possibly other distros) do not know this tag.
+Recommends:       cron
 %endif
 
 
@@ -126,18 +165,26 @@ This package includes the Bcfg2 client software.
 
 %package server
 Summary:          Bcfg2 Server
+%if 0%{?suse_version}
+Group:            System/Management
+%else
 Group:            System Environment/Daemons
+%endif
 Requires:         bcfg2 = %{version}-%{release}
 Requires:         python-lxml >= 1.2.1
+%if 0%{?suse_version}
+Requires:         python-pyinotify
+Requires:         python-python-daemon
+%else
 Requires:         python-inotify
 Requires:         python-daemon
+%endif
 Requires:         /usr/sbin/sendmail
 Requires:         /usr/bin/openssl
-Requires:         python-genshi
-Requires:         python-cheetah
 Requires:         graphviz
 Requires:         python-nose
 
+%if %{_vendor} == redhat
 %if 0%{?fedora} >= 16
 Requires(post):   systemd-units
 Requires(preun):  systemd-units
@@ -148,6 +195,7 @@ Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
 Requires(postun): /sbin/service
+%endif
 %endif
 
 
@@ -181,7 +229,11 @@ This package includes the Bcfg2 server software.
 
 %package server-cherrypy
 Summary:          Bcfg2 Server - CherryPy backend
+%if 0%{?suse_version}
+Group:            System/Management
+%else
 Group:            System Environment/Daemons
+%endif
 Requires:         bcfg2 = %{version}-%{release}
 Requires:         bcfg2-server = %{version}-%{release}
 
@@ -220,14 +272,25 @@ This package includes the Bcfg2 CherryPy server backend.
 
 %package web
 Summary:          Bcfg2 Web Reporting Interface
-Group:            System Tools
 
+%if 0%{?suse_version}
+Group:            System/Management
+Requires:         python-django >= 1.2
+Requires:         python-django-south >= 0.7
+%else
+Group:            System Tools
 Requires:         Django >= 1.2
 Requires:         Django-south >= 0.7
+Requires:         bcfg2-server
+%endif
 Requires:         httpd
+%if "%{_vendor}" == "redhat"
 Requires:         mod_wsgi
-
 %global apache_conf %{_sysconfdir}/httpd
+%else
+Requires:         apache2-mod_wsgi
+%global apache_conf %{_sysconfdir}/apache2
+%endif
 
 
 %description web
@@ -261,7 +324,11 @@ This package includes the Bcfg2 reports web frontend.
 
 %package doc
 Summary:          Documentation for Bcfg2
+%if 0%{?suse_version}
+Group:            Documentation/HTML
+%else
 Group:            Documentation
+%endif
 
 
 %description doc
@@ -331,6 +398,7 @@ This package includes the examples files for Bcfg2.
 %setup -q -n %{name}-%{version}%{?_pre_rc}
 
 # The pylint and pep8 unit tests fail on RH-derivative distros
+%if "%{_vendor}" == "redhat"
 mv testsuite/Testsrc/test_code_checks.py \
     testsuite/Testsrc/test_code_checks.py.disable_unit_tests
 awk '
@@ -340,6 +408,7 @@ awk '
     {print $0}
     ' testsuite/Testsrc/test_code_checks.py.disable_unit_tests \
     > testsuite/Testsrc/test_code_checks.py
+%endif
 
 # Fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' tools/bcfg2-cron
@@ -350,7 +419,7 @@ awk '
 # Get rid of extraneous shebangs
 for f in `find src/lib -name \*.py`
 do
-    %{__sed} -i -e '/^#!/,1d' $f
+    sed -i -e '/^#!/,1d' $f
 done
 
 sed -i "s/apache2/httpd/g" misc/apache/bcfg2.conf
@@ -363,8 +432,8 @@ sed -i "s/apache2/httpd/g" misc/apache/bcfg2.conf
 
 
 %install
-%if 0%{?rhel} == 5
-# EL5 requires the buildroot to be cleaned manually
+%if 0%{?rhel} == 5 || 0%{?suse_version}
+# EL5 and OpenSUSE require the buildroot to be cleaned manually
 rm -rf %{buildroot}
 %endif
 
@@ -378,6 +447,9 @@ install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_libexecdir}
 install -d %{buildroot}%{_localstatedir}/cache/%{name}
 install -d %{buildroot}%{_localstatedir}/lib/%{name}
+%if 0%{?suse_version}
+install -d %{buildroot}/var/adm/fillup-templates
+%endif
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
@@ -401,6 +473,14 @@ install -m 644 debian/bcfg2.default \
     %{buildroot}%{_sysconfdir}/sysconfig/bcfg2
 install -m 644 debian/bcfg2-server.default \
     %{buildroot}%{_sysconfdir}/sysconfig/bcfg2-server
+%if 0%{?suse_version}
+install -m 755 debian/bcfg2.default \
+    %{buildroot}/var/adm/fillup-templates/sysconfig.bcfg2
+install -m 755 debian/bcfg2-server.default \
+    %{buildroot}/var/adm/fillup-templates/sysconfig.bcfg2-server
+ln -s %{_initrddir}/bcfg2 %{buildroot}%{_sbindir}/rcbcfg2
+ln -s %{_initrddir}/bcfg2-server %{buildroot}%{_sbindir}/rcbcfg2-server
+%endif
 
 touch %{buildroot}%{_sysconfdir}/%{name}.{cert,conf,key}
 
@@ -416,6 +496,10 @@ install -d %{buildroot}%{apache_conf}/conf.d
 install -p -m 644 misc/apache/bcfg2.conf \
     %{buildroot}%{apache_conf}/conf.d/wsgi_bcfg2.conf
 
+# mandriva cannot handle %ghost without the file existing,
+# so let's touch a bunch of empty config files
+touch %{buildroot}%{_sysconfdir}/bcfg2.conf
+
 %if 0%{?rhel} == 5
 # Required for EL5
 %clean
@@ -427,10 +511,10 @@ rm -rf %{buildroot}
 # EL5 lacks python-mock, so test suite is disabled
 %check
 # Downloads not allowed in koji; fix .xsd urls to point to local files
-sed -i "s@schema_url = .*\$@schema_url = 'file://`pwd`/`basename %{SOURCE2}`'@" \
+sed -i "s@schema_url = .*\$@schema_url = 'file://`pwd`/`basename %{SOURCE1}`'@" \
     testsuite/Testschema/test_schema.py
 sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
-    %{SOURCE2} > `basename %{SOURCE2}`
+    %{SOURCE1} > `basename %{SOURCE1}`
 %{__python} setup.py test
 %endif
 
@@ -441,11 +525,13 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %else
   if [ $1 -eq 1 ] ; then
       # Initial installation
-  %if 0%{?fedora} >= 16
+  %if 0%{?suse_version}
+      %fillup_and_insserv -f bcfg2
+  %else %if 0%{?fedora} >= 16
       /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
       /sbin/chkconfig --add bcfg2
-  %endif
+  %endif %endif
   fi
 %endif
 
@@ -455,11 +541,13 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %else
   if [ $1 -eq 1 ] ; then
       # Initial installation
-  %if 0%{?fedora} >= 16
+  %if 0%{?suse_version}
+      %fillup_and_insserv -f bcfg2-server
+  %else %if 0%{?fedora} >= 16
       /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
       /sbin/chkconfig --add bcfg2-server
-  %endif
+  %endif %endif
   fi
 %endif
 
@@ -469,13 +557,15 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %else
   if [ $1 -eq 0 ]; then
       # Package removal, not upgrade
-  %if 0%{?fedora} >= 16
+  %if 0%{?suse_version}
+      %stop_on_removal bcfg2
+  %else %if 0%{?fedora} >= 16
       /bin/systemctl --no-reload disable bcfg2.service > /dev/null 2>&1 || :
       /bin/systemctl stop bcfg2.service > /dev/null 2>&1 || :
   %else
       /sbin/service bcfg2 stop &>/dev/null || :
       /sbin/chkconfig --del bcfg2
-  %endif
+  %endif %endif
   fi
 %endif
 
@@ -485,13 +575,16 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %else
   if [ $1 -eq 0 ]; then
       # Package removal, not upgrade
-  %if 0%{?fedora} >= 16
+  %if 0%{?suse_version}
+      %stop_on_removal bcfg2-server
+      %stop_on_removal bcfg2-report-collector
+  %else %if 0%{?fedora} >= 16
       /bin/systemctl --no-reload disable bcfg2-server.service > /dev/null 2>&1 || :
       /bin/systemctl stop bcfg2-server.service > /dev/null 2>&1 || :
   %else
       /sbin/service bcfg2-server stop &>/dev/null || :
       /sbin/chkconfig --del bcfg2-server
-  %endif
+  %endif %endif
   fi
 %endif
 
@@ -504,11 +597,13 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
   %endif
   if [ $1 -ge 1 ] ; then
       # Package upgrade, not uninstall
-  %if 0%{?fedora} >= 16
+  %if 0%{?suse_version}
+      %insserv_cleanup
+  %else %if 0%{?fedora} >= 16
       /bin/systemctl try-restart bcfg2.service >/dev/null 2>&1 || :
   %else
       /sbin/service bcfg2 condrestart &>/dev/null || :
-  %endif
+  %endif %endif
   fi
 %endif
 
@@ -527,8 +622,15 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
       /sbin/service bcfg2-server condrestart &>/dev/null || :
   %endif
   fi
+  %if 0%{?suse_version}
+  if [ $1 -eq 0 ]; then
+      # clean up on removal.
+      %insserv_cleanup
+  fi
+  %endif
 %endif
 
+%if 0%{?fedora} || 0%{?rhel}
 %triggerun -- bcfg2 < 1.2.1-1
 /usr/bin/systemd-sysv-convert --save bcfg2 >/dev/null 2>&1 || :
 /bin/systemctl --no-reload enable bcfg2.service >/dev/null 2>&1 || :
@@ -540,10 +642,12 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 /bin/systemctl --no-reload enable bcfg2-server.service >/dev/null 2>&1 || :
 /sbin/chkconfig --del bcfg2-server >/dev/null 2>&1 || :
 /bin/systemctl try-restart bcfg2-server.service >/dev/null 2>&1 || :
+%endif
+
 
 %files
-%if 0%{?rhel} == 5
-# Required for EL5
+%if 0%{?rhel} == 5 || 0%{?suse_version}
+# Required for EL5 and OpenSUSE
 %defattr(-,root,root,-)
 %endif
 %doc COPYRIGHT LICENSE README
@@ -556,7 +660,11 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %else
     %{_initrddir}/bcfg2
 %endif
+%if 0%{?fedora} || 0%{?rhel}
 %config(noreplace) %{_sysconfdir}/sysconfig/bcfg2
+%else
+%config(noreplace) %{_sysconfdir}/default/bcfg2
+%endif
 %{_sysconfdir}/cron.daily/bcfg2
 %{_sysconfdir}/cron.hourly/bcfg2
 %{_sbindir}/bcfg2
@@ -572,9 +680,13 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %{python_sitelib}/Bcfg2/Proxy.py*
 %{python_sitelib}/Bcfg2/Utils.py*
 %{python_sitelib}/Bcfg2/version.py*
+%if 0%{?suse_version}
+%{_sbindir}/rcbcfg2
+%config(noreplace) /var/adm/fillup-templates/sysconfig.bcfg2
+%endif
 
 %files server
-%if 0%{?rhel} == 5
+%if 0%{?rhel} == 5 || 0%{?suse_version}
 %defattr(-,root,root,-)
 %endif
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.key
@@ -593,12 +705,18 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %{python_sitelib}/Bcfg2/Statistics.py*
 %{python_sitelib}/Bcfg2/settings.py*
 %{python_sitelib}/Bcfg2/Server
+%{python_sitelib}/Bcfg2/Reporting
+%{python_sitelib}/Bcfg2/manage.py*
 %exclude %{python_sitelib}/Bcfg2/Server/CherryPyCore.py
 
 %dir %{_datadir}/bcfg2
-%{_datadir}/bcfg2/Hostbase
 %{_datadir}/bcfg2/schemas
 %{_datadir}/bcfg2/xsl-transforms
+%{_datadir}/bcfg2/Hostbase
+%if 0%{?suse_version}
+%{_sbindir}/rcbcfg2-server
+%config(noreplace) /var/adm/fillup-templates/sysconfig.bcfg2-server
+%endif
 
 %{_mandir}/man5/bcfg2-lint.conf.5*
 %{_mandir}/man8/bcfg2*.8*
@@ -606,38 +724,43 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %doc tools/*
 
 %files server-cherrypy
-%if 0%{?rhel} == 5
+%if 0%{?rhel} == 5 || 0%{?suse_version}
 %defattr(-,root,root,-)
 %endif
 %{python_sitelib}/Bcfg2/Server/CherryPyCore.py
 
 %files web
-%if 0%{?rhel} == 5
+%if 0%{?rhel} == 5 || 0%{?suse_version}
 %defattr(-,root,root,-)
 %endif
 %{_datadir}/bcfg2/reports.wsgi
 %{_datadir}/bcfg2/site_media
-%{python_sitelib}/Bcfg2/Reporting
-%{python_sitelib}/Bcfg2/manage.py*
 %config(noreplace) %{apache_conf}/conf.d/wsgi_bcfg2.conf
 
 %files doc
-%if 0%{?rhel} == 5
+%if 0%{?rhel} == 5 || 0%{?suse_version}
 %defattr(-,root,root,-)
 %endif
 %doc build/sphinx/html/*
 
 %files examples
-%if 0%{?rhel} == 5
+%if 0%{?rhel} == 5 || 0%{?suse_version}
 %defattr(-,root,root,-)
 %endif
 %doc examples/*
 
+
 %changelog
+* Thu Nov 07 2013 Sol Jerome <sol.jerome@gmail.com> 1.3.3-1
+- New upstream release
+
 * Sun Aug 04 2013 John Morris <john@zultron.com> - 1.3.2-2
 - Reconcile divergences with upstream specfile, as requested by upstream
   (equally large changes made upstream version to reconcile with
   Fedora package)
+- Python macro cleanups
+- Accommodations for OpenSUSE
+- Macros for pre and rc releases
 - Move BRs to top of file
 - Rearrange lines to match upstream
 - Change %%descriptions to match upstream
