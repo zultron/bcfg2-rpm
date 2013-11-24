@@ -22,6 +22,12 @@
 #%%global _pre 2
 %global _pre_rc %{?_pre:.pre%{_pre}}%{?_rc:.rc%{_rc}}
 
+# cherrypy 3.3 actually doesn't exist yet, but 3.2 has bugs that
+# prevent it from working:
+# https://bitbucket.org/cherrypy/cherrypy/issue/1154/assertionerror-in-recv-when-ssl-is-enabled
+%global build_cherry_py 0
+
+
 Name:             bcfg2
 Version:          1.3.3
 Release:          2%{?_pre_rc}%{?dist}
@@ -54,7 +60,9 @@ BuildRequires:    python-Genshi
 BuildRequires:    python-gamin
 BuildRequires:    python-pyinotify
 BuildRequires:    python-python-daemon
+%if %{build_cherry_py}
 BuildRequires:    python-CherryPy >= 3
+%endif
 %else # ! suse_version
 BuildRequires:    python-daemon
 BuildRequires:    python-inotify
@@ -78,7 +86,9 @@ BuildRequires:    python-cheetah
 BuildRequires:    pylibacl
 BuildRequires:    libselinux-python
 BuildRequires:    python-pep8
+%if %{build_cherry_py}
 BuildRequires:    python-cherrypy >= 3
+%endif
 BuildRequires:    python-mock
 BuildRequires:    pylint
 %endif # rhel > 5
@@ -227,6 +237,7 @@ deployment strategies.
 
 This package includes the Bcfg2 server software.
 
+%if %{build_cherry_py}
 %package server-cherrypy
 Summary:          Bcfg2 Server - CherryPy backend
 %if 0%{?suse_version}
@@ -269,6 +280,8 @@ Bcfg2 can enable the construction of complex change management and
 deployment strategies.
 
 This package includes the Bcfg2 CherryPy server backend.
+%endif # build_cherry_py
+
 
 %package web
 Summary:          Bcfg2 Web Reporting Interface
@@ -723,11 +736,13 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 
 %doc tools/*
 
+%if %{build_cherry_py}
 %files server-cherrypy
 %if 0%{?rhel} == 5 || 0%{?suse_version}
 %defattr(-,root,root,-)
 %endif
 %{python_sitelib}/Bcfg2/Server/CherryPyCore.py
+%endif
 
 %files web
 %if 0%{?rhel} == 5 || 0%{?suse_version}
@@ -753,6 +768,7 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %changelog
 * Sun Nov 24 2013 John Morris <john@zultron.com> - 1.3.3-2
 - Fix CherryPyCore.py exclude glob to include compiled files
+- Disable server-cherrypy package build to make Fedora buildsys happy
 
 * Thu Nov 07 2013 Sol Jerome <sol.jerome@gmail.com> 1.3.3-1
 - New upstream release
