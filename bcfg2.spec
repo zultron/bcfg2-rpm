@@ -24,7 +24,7 @@
 
 Name:             bcfg2
 Version:          1.3.3
-Release:          1%{?_pre_rc}%{?dist}
+Release:          2%{?_pre_rc}%{?dist}
 Summary:          A configuration management system
 
 %if 0%{?suse_version}
@@ -707,7 +707,7 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %{python_sitelib}/Bcfg2/Server
 %{python_sitelib}/Bcfg2/Reporting
 %{python_sitelib}/Bcfg2/manage.py*
-%exclude %{python_sitelib}/Bcfg2/Server/CherryPyCore.py
+%exclude %{python_sitelib}/Bcfg2/Server/CherryPyCore.py*
 
 %dir %{_datadir}/bcfg2
 %{_datadir}/bcfg2/schemas
@@ -751,6 +751,9 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 
 
 %changelog
+* Sun Nov 24 2013 John Morris <john@zultron.com> - 1.3.3-2
+- Fix CherryPyCore.py exclude glob to include compiled files
+
 * Thu Nov 07 2013 Sol Jerome <sol.jerome@gmail.com> 1.3.3-1
 - New upstream release
 
