@@ -30,7 +30,7 @@
 
 Name:             bcfg2
 Version:          1.3.3
-Release:          2%{?_pre_rc}%{?dist}
+Release:          3%{?_pre_rc}%{?dist}
 Summary:          A configuration management system
 
 %if 0%{?suse_version}
@@ -288,12 +288,8 @@ Summary:          Bcfg2 Web Reporting Interface
 
 %if 0%{?suse_version}
 Group:            System/Management
-Requires:         python-django >= 1.2
-Requires:         python-django-south >= 0.7
 %else
 Group:            System Tools
-Requires:         Django >= 1.2
-Requires:         Django-south >= 0.7
 Requires:         bcfg2-server
 %endif
 Requires:         httpd
@@ -766,6 +762,9 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 
 
 %changelog
+* Sun Dec 15 2013 John Morris <john@zultron.com> - 1.3.3-3
+- Remove unneeded Django dep in 'web' package, bz #1043229
+
 * Sun Nov 24 2013 John Morris <john@zultron.com> - 1.3.3-2
 - Fix CherryPyCore.py exclude glob to include compiled files
 - Disable server-cherrypy package build to make Fedora buildsys happy
