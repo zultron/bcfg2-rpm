@@ -88,14 +88,17 @@ BuildRequires:    Django
 %endif
 BuildRequires:    python-genshi
 BuildRequires:    python-cheetah
-BuildRequires:    pylibacl
 BuildRequires:    libselinux-python
+%if 0%{?rhel} != 7
+# FIXME:  Not yet present in EPEL7; for %%check
+BuildRequires:    pylibacl
 BuildRequires:    python-pep8
+BuildRequires:    pylint
+%endif
 %if %{build_cherry_py}
 BuildRequires:    python-cherrypy >= 3
 %endif
 BuildRequires:    python-mock
-BuildRequires:    pylint
 %endif # rhel > 5
 %endif # vendor != redhat || rhel defined
 %endif # ! suse_version
@@ -530,6 +533,8 @@ rm -rf %{buildroot}
 
 %if 0%{?rhel} != 5
 # EL5 lacks python-mock, so test suite is disabled
+%if 0%{?rhel} != 7
+# FIXME:  EL7 has some missing EPEL deps, so test suite is disabled
 %check
 # Downloads not allowed in koji; fix .xsd urls to point to local files
 sed -i "s@schema_url = .*\$@schema_url = 'file://`pwd`/`basename %{SOURCE1}`'@" \
@@ -537,6 +542,7 @@ sed -i "s@schema_url = .*\$@schema_url = 'file://`pwd`/`basename %{SOURCE1}`'@" 
 sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
     %{SOURCE1} > `basename %{SOURCE1}`
 %{__python} setup.py test
+%endif
 %endif
 
 
@@ -779,6 +785,7 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %changelog
 * Sat Feb  1 2014 John Morris <john@zultron.com> - 1.3.3-4
 - Disable bcfg2-web package on EL5; bz #1058427
+- Disable %%check on EL7; missing EPEL deps
 
 * Mon Jan 27 2014 Sol Jerome <sol.jerome@gmail.com> - 1.3.3-4
 - Fix BuildRequires for EPEL7's Django
