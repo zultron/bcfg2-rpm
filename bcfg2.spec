@@ -41,7 +41,7 @@ Group:            Applications/System
 %endif
 License:          BSD
 URL:              http://bcfg2.org
-Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/bcfg2-%{version}%{?_pre_rc}.tar.gz
+Source0:          ftp://ftp.mcs.anl.gov/pub/bcfg/%{name}-%{version}%{?_pre_rc}.tar.gz
 # Used in %%check
 Source1:          http://www.w3.org/2001/XMLSchema.xsd
 %if %{?rhel}%{!?rhel:10} <= 5 || 0%{?suse_version}
@@ -80,7 +80,12 @@ BuildRequires:    python-sqlalchemy
 BuildRequires:    python-nose
 BuildRequires:    mock
 BuildRequires:    m2crypto
+# EPEL uses the properly-named python-django starting with EPEL7
+%if 0%{?rhel} && 0%{?rhel} > 6
+BuildRequires:    python-django
+%else
 BuildRequires:    Django
+%endif
 BuildRequires:    python-genshi
 BuildRequires:    python-cheetah
 BuildRequires:    pylibacl
@@ -122,7 +127,6 @@ BuildRequires:    python-docutils
 BuildRequires:    systemd-units
 %endif
 
-Requires:         python-lxml
 %if 0%{?rhel} && 0%{?rhel} < 6
 Requires:         python-ssl
 %endif
@@ -288,8 +292,12 @@ Summary:          Bcfg2 Web Reporting Interface
 
 %if 0%{?suse_version}
 Group:            System/Management
+Requires:         python-django >= 1.2
+Requires:         python-django-south >= 0.7
 %else
 Group:            System Tools
+Requires:         Django >= 1.2
+Requires:         Django-south >= 0.7
 Requires:         bcfg2-server
 %endif
 Requires:         httpd
@@ -422,9 +430,6 @@ awk '
 # Fixup some paths
 %{__perl} -pi -e 's@/etc/default@%{_sysconfdir}/sysconfig@g' tools/bcfg2-cron
 
-%{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.daily
-%{__perl} -pi -e 's@/usr/lib/bcfg2@%{_libexecdir}@g' debian/bcfg2.cron.hourly
-
 # Get rid of extraneous shebangs
 for f in `find src/lib -name \*.py`
 do
@@ -462,7 +467,7 @@ install -d %{buildroot}/var/adm/fillup-templates
 
 mv %{buildroot}%{_bindir}/bcfg2* %{buildroot}%{_sbindir}
 
-%if 0%{?fedora} < 16
+%if 0%{?fedora} && 0%{?fedora} < 16 || 0%{?rhel} && 0%{?rhel} < 7
 # Install SysV init scripts for everyone but new Fedoras
 install -m 755 redhat/scripts/bcfg2.init \
     %{buildroot}%{_initrddir}/bcfg2
@@ -500,10 +505,17 @@ install -p -m 644 redhat/systemd/%{name}.service \
 install -p -m 644 redhat/systemd/%{name}-server.service \
     %{buildroot}%{_unitdir}/%{name}-server.service
 
+%if 0%{?rhel} != 5
 # Webserver
 install -d %{buildroot}%{apache_conf}/conf.d
 install -p -m 644 misc/apache/bcfg2.conf \
     %{buildroot}%{apache_conf}/conf.d/wsgi_bcfg2.conf
+%else
+# remove web server files not in EL5 packages
+rm -r %{buildroot}%{_datadir}/bcfg2/reports.wsgi \
+      %{buildroot}%{_datadir}/bcfg2/site_media
+%endif
+
 
 # mandriva cannot handle %ghost without the file existing,
 # so let's touch a bunch of empty config files
@@ -664,7 +676,7 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %{_mandir}/man5/bcfg2.conf.5*
 %ghost %attr(600,root,root) %config(noreplace,missingok) %{_sysconfdir}/bcfg2.cert
 %ghost %attr(0600,root,root) %config(noreplace,missingok) %{_sysconfdir}/bcfg2.conf
-%if 0%{?fedora} >= 16
+%if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
     %config(noreplace) %{_unitdir}/%{name}.service
 %else
     %{_initrddir}/bcfg2
@@ -699,7 +711,7 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %defattr(-,root,root,-)
 %endif
 %ghost %attr(600,root,root) %config(noreplace) %{_sysconfdir}/bcfg2.key
-%if 0%{?fedora} >= 16
+%if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
     %config(noreplace) %{_unitdir}/%{name}-server.service
 %else
     %{_initrddir}/bcfg2-server
@@ -740,13 +752,16 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 %{python_sitelib}/Bcfg2/Server/CherryPyCore.py
 %endif
 
+# bcfg2-web package is disabled on EL5, which lacks Django
+%if 0%{?rhel} != 5
 %files web
-%if 0%{?rhel} == 5 || 0%{?suse_version}
+%if 0%{?suse_version}
 %defattr(-,root,root,-)
 %endif
 %{_datadir}/bcfg2/reports.wsgi
 %{_datadir}/bcfg2/site_media
 %config(noreplace) %{apache_conf}/conf.d/wsgi_bcfg2.conf
+%endif
 
 %files doc
 %if 0%{?rhel} == 5 || 0%{?suse_version}
@@ -762,6 +777,16 @@ sed "s@http://www.w3.org/2001/xml.xsd@file://$(pwd)/schemas/xml.xsd@" \
 
 
 %changelog
+* Sat Feb  1 2014 John Morris <john@zultron.com> - 1.3.3-4
+- Disable bcfg2-web package on EL5; bz #1058427
+
+* Mon Jan 27 2014 Sol Jerome <sol.jerome@gmail.com> - 1.3.3-4
+- Fix BuildRequires for EPEL7's Django
+- Remove unnecessary client-side lxml dependency
+- Add Django dependency for bcfg2-web (the web package *does* require
+  Django for the database)
+- Fix OS detection for RHEL7 initscripts
+
 * Sun Dec 15 2013 John Morris <john@zultron.com> - 1.3.3-3
 - Remove unneeded Django dep in 'web' package, bz #1043229
 
